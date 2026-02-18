@@ -13,8 +13,6 @@
     <style>
       html, body { height: 100%; }
       video { display:block; }
-
-      /* keep chat bubble above everything */
       #chtl-script, iframe, .chtl-widget, .chatling-widget { z-index: 999999 !important; }
     </style>
   </head>
@@ -74,28 +72,19 @@
       };
 
       const Pill = ({ children }) => (
-        <span className="inline-flex items-center gap-2 rounded-full border border-[#C9A24A]/25 bg-[#C9A24A]/6 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#EDE7D9]/80">
+        <span className="inline-flex items-center rounded-full border border-[#C9A24A]/25 bg-[#C9A24A]/6 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#EDE7D9]/80">
           {children}
         </span>
       );
 
       const Button = ({ variant="primary", href, onClick, className="", children }) => {
-        const base =
-          "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold tracking-wide transition active:scale-[0.99]";
+        const base = "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold tracking-wide transition active:scale-[0.99]";
         const styles = {
-          primary:
-            "bg-[#C9A24A] text-[#071E12] hover:bg-[#D7B66A] shadow-[0_12px_40px_rgba(201,162,74,0.14)]",
-          ghost:
-            "bg-transparent text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#C9A24A]/10",
-          dark:
-            "bg-[#05110A] text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#030A05]",
+          primary: "bg-[#C9A24A] text-[#071E12] hover:bg-[#D7B66A] shadow-[0_12px_40px_rgba(201,162,74,0.14)]",
+          ghost: "bg-transparent text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#C9A24A]/10",
         };
         const Comp = href ? "a" : "button";
-        return (
-          <Comp href={href} onClick={onClick} className={cn(base, styles[variant], className)}>
-            {children}
-          </Comp>
-        );
+        return <Comp href={href} onClick={onClick} className={cn(base, styles[variant], className)}>{children}</Comp>;
       };
 
       const Divider = () => (
@@ -104,36 +93,21 @@
         </div>
       );
 
-      function GlassCard({ children, className="" }) {
-        return (
-          <div className={cn("rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4", className)}>
-            {children}
-          </div>
-        );
-      }
+      const GlassCard = ({ children, className="" }) => (
+        <div className={cn("rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4", className)}>{children}</div>
+      );
 
-      function VisualDirectionVideo() {
-        return (
-          <div className="relative overflow-hidden rounded-[32px] border border-[#C9A24A]/20 bg-[#C9A24A]/4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
-            <div className="aspect-video w-full">
-              <video
-                className="h-full w-full object-cover"
-                src="estate-sweep.mp4"
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-              ></video>
-            </div>
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/80 via-transparent to-transparent"></div>
-            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
+      const VisualDirectionVideo = () => (
+        <div className="relative overflow-hidden rounded-[32px] border border-[#C9A24A]/20 bg-[#C9A24A]/4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
+          <div className="aspect-video w-full">
+            <video className="h-full w-full object-cover" src="estate-sweep.mp4" autoPlay loop muted playsInline preload="auto"></video>
           </div>
-        );
-      }
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/80 via-transparent to-transparent"></div>
+          <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
+        </div>
+      );
 
-      function ConceptGallery() {
-        // THESE MUST MATCH YOUR REPO FILENAMES EXACTLY (case-sensitive)
+      const ConceptGallery = () => {
         const items = useMemo(() => ([
           { title:"Material direction", meta:"Brass, stone, warm woods", img:"material.jpg" },
           { title:"Elevation study", meta:"Clean lines, deep shadows", img:"Elevation.jpg" },
@@ -148,27 +122,21 @@
             {items.map((it) => (
               <div key={it.title} className="relative overflow-hidden rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4">
                 <div className="relative aspect-[4/3] w-full overflow-hidden">
-                  <img
-                    src={it.img}
-                    alt={it.title}
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover"
-                    onError={(e)=>{ e.currentTarget.style.display="none"; }}
-                  />
+                  <img src={it.img} alt={it.title} className="absolute inset-0 h-full w-full object-cover" />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/75 via-[#071E12]/10 to-transparent"></div>
                   <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
                 </div>
                 <div className="p-5">
-                  <div className="text-sm font-semibold text-[#EDE7D9]">{it.title}</div>
+                  <div className="text-sm font-semibold">{it.title}</div>
                   <div className="mt-1 text-xs text-[#EDE7D9]/60">{it.meta}</div>
                 </div>
               </div>
             ))}
           </div>
         );
-      }
+      };
 
-      function ProcessCards() {
+      const ProcessCards = () => {
         const rows = [
           { k:"1. Pre Construction Planning", v:"Initial meetings with your architect/design team—or an interview process with our preferred partners." },
           { k:"2. Field Mindset", v:"Set trades up for success through clarity: clean scopes, sequencing, and jobsite readiness." },
@@ -185,9 +153,9 @@
             ))}
           </div>
         );
-      }
+      };
 
-      function FAQ() {
+      const FAQ = () => {
         const faqs = [
           { q:"Do you work cost-plus?", a:"Yes. We build primarily on a cost-plus basis with clear scope, allowances, and change control." },
           { q:"Do you require an architect?", a:"We can start with your existing architect, or we can help you interview and select from preferred partners." },
@@ -203,77 +171,71 @@
             ))}
           </div>
         );
-      }
+      };
 
-      function ContactCard() {
-        return (
-          <GlassCard className="p-6">
-            <div className="text-sm font-semibold">Contact</div>
-            <div className="mt-4 grid gap-3">
-              <a href={BRAND.phoneHref} className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
-                    <Icon.Phone className="h-5 w-5 text-[#C9A24A]" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold">Call</div>
-                    <div className="text-sm text-[#EDE7D9]/70">{BRAND.phoneDisplay}</div>
-                  </div>
+      const ContactCard = () => (
+        <GlassCard className="p-6">
+          <div className="text-sm font-semibold">Contact</div>
+          <div className="mt-4 grid gap-3">
+            <a href={BRAND.phoneHref} className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10">
+              <div className="flex items-center gap-3">
+                <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                  <Icon.Phone className="h-5 w-5 text-[#C9A24A]" />
                 </div>
-                <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
-              </a>
-
-              <a href={BRAND.emailHref} className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
-                    <Icon.Mail className="h-5 w-5 text-[#C9A24A]" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold">Email</div>
-                    <div className="text-sm text-[#EDE7D9]/70">{BRAND.emailDisplay}</div>
-                  </div>
-                </div>
-                <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
-              </a>
-
-              <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5">
-                <div className="flex items-center gap-3">
-                  <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
-                    <Icon.MapPin className="h-5 w-5 text-[#C9A24A]" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-semibold">Service areas</div>
-                    <div className="text-sm text-[#EDE7D9]/70">Dallas</div>
-                  </div>
-                </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Pill>Highland Park</Pill>
-                  <Pill>Preston Hollow</Pill>
-                  <Pill>Historic Old East Dallas</Pill>
+                <div>
+                  <div className="text-sm font-semibold">Call</div>
+                  <div className="text-sm text-[#EDE7D9]/70">{BRAND.phoneDisplay}</div>
                 </div>
               </div>
-            </div>
-          </GlassCard>
-        );
-      }
+              <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
+            </a>
 
-      function PageWrap({ eyebrow, title, subtitle, children, right }) {
-        return (
-          <div className="mx-auto max-w-6xl px-4 pb-16 pt-10">
-            <div className="grid gap-8 md:grid-cols-2 md:items-end">
-              <div>
-                <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">{eyebrow}</div>
-                <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h1>
-                {subtitle ? (
-                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">{subtitle}</p>
-                ) : null}
+            <a href={BRAND.emailHref} className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10">
+              <div className="flex items-center gap-3">
+                <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                  <Icon.Mail className="h-5 w-5 text-[#C9A24A]" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold">Email</div>
+                  <div className="text-sm text-[#EDE7D9]/70">{BRAND.emailDisplay}</div>
+                </div>
               </div>
-              {right ? <div className="md:justify-self-end">{right}</div> : null}
+              <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
+            </a>
+
+            <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5">
+              <div className="flex items-center gap-3">
+                <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                  <Icon.MapPin className="h-5 w-5 text-[#C9A24A]" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold">Service areas</div>
+                  <div className="text-sm text-[#EDE7D9]/70">Dallas</div>
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Pill>Highland Park</Pill>
+                <Pill>Preston Hollow</Pill>
+                <Pill>Historic Old East Dallas</Pill>
+              </div>
             </div>
-            <div className="mt-8">{children}</div>
           </div>
-        );
-      }
+        </GlassCard>
+      );
+
+      const PageWrap = ({ eyebrow, title, subtitle, children, right }) => (
+        <div className="mx-auto max-w-6xl px-4 pb-16 pt-10">
+          <div className="grid gap-8 md:grid-cols-2 md:items-end">
+            <div>
+              <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">{eyebrow}</div>
+              <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h1>
+              {subtitle ? <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">{subtitle}</p> : null}
+            </div>
+            {right ? <div className="md:justify-self-end">{right}</div> : null}
+          </div>
+          <div className="mt-8">{children}</div>
+        </div>
+      );
 
       function App() {
         const nav = useMemo(() => ([
@@ -284,6 +246,7 @@
           { id:"faq", label:"FAQ" },
           { id:"contact", label:"Contact" },
         ]), []);
+
         const [page, setPage] = useState("home");
 
         return (
@@ -353,43 +316,21 @@
                       <Button variant="primary" onClick={()=>setPage("contact")}>
                         Request a consult <Icon.ArrowRight className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" onClick={()=>setPage("approach")}>
-                        How we work
-                      </Button>
-                      <Button variant="ghost" onClick={()=>setPage("standards")}>
-                        Our standard
-                      </Button>
+                      <Button variant="ghost" onClick={()=>setPage("approach")}>How we work</Button>
+                      <Button variant="ghost" onClick={()=>setPage("standards")}>Our standard</Button>
                     </div>
 
                     <GlassCard className="mt-8 p-5">
-                      <div className="text-sm font-semibold">
-                        Build your dream with detail-oriented building science professionals.
-                      </div>
-                      <div className="mt-1 text-sm text-[#EDE7D9]/70">
-                        Clear decisions, disciplined execution, and a team built to protect the standard.
-                      </div>
+                      <div className="text-sm font-semibold">Build your dream with detail-oriented building science professionals.</div>
+                      <div className="mt-1 text-sm text-[#EDE7D9]/70">Clear decisions, disciplined execution, and a team built to protect the standard.</div>
                     </GlassCard>
                   </div>
 
                   <div className="relative">
                     <GlassCard className="p-4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
                       <div className="rounded-[28px] border border-[#C9A24A]/20 bg-gradient-to-br from-[#C9A24A]/12 via-[#C9A24A]/7 to-transparent p-5">
-                        <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/60">
-                          Startup, serious systems
-                        </div>
-                        <div className="mt-6 grid gap-3">
-                          {[
-                            { k:"1. Pre Construction Planning", v:"Initial meetings with your architect/design team—or an interview process with our preferred partners." },
-                            { k:"2. Field Mindset", v:"Set trades up for success through clarity: clean scopes, sequencing, and jobsite readiness." },
-                            { k:"3. Office Mindset", v:"Weekly homeowner meetings for updates and selections approvals. Timely purchase orders so materials are onsite when needed." },
-                            { k:"4. Detailed Home Delivery", v:"A fully searchable digital turnover package with warranties, trade contacts, final build sheet, and appliance documentation." },
-                          ].map((row)=>(
-                            <div key={row.k} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">
-                              <div className="text-sm font-semibold">{row.k}</div>
-                              <div className="mt-1 text-sm text-[#EDE7D9]/70">{row.v}</div>
-                            </div>
-                          ))}
-                        </div>
+                        <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/60">Startup, serious systems</div>
+                        <div className="mt-6"><ProcessCards /></div>
                       </div>
                     </GlassCard>
                   </div>
@@ -400,21 +341,14 @@
                 <div className="mx-auto max-w-6xl px-4 py-14">
                   <div className="grid gap-8 md:grid-cols-2 md:items-end">
                     <div>
-                      <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">
-                        Visual direction
-                      </div>
-                      <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-                        Cinematic concept, photo-ready standards
-                      </h2>
+                      <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">Visual direction</div>
+                      <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Cinematic concept, photo-ready standards</h2>
                       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">
-                        We’re a startup, so we won’t borrow photos from past employers. Until our first builds are shot,
-                        we show concept media and material direction to communicate taste and standards.
+                        We’re a startup, so we won’t borrow photos from past employers. Until our first builds are shot, we show concept media and material direction.
                       </p>
                     </div>
                     <div className="flex justify-start md:justify-end">
-                      <Button variant="ghost" onClick={()=>setPage("contact")}>
-                        Talk scope <Icon.ArrowRight className="h-4 w-4" />
-                      </Button>
+                      <Button variant="ghost" onClick={()=>setPage("contact")}>Talk scope <Icon.ArrowRight className="h-4 w-4" /></Button>
                     </div>
                   </div>
 
@@ -429,55 +363,102 @@
             ) : null}
 
             {page === "approach" ? (
-              <PageWrap
-                eyebrow="Approach"
-                title="How we run work"
-                subtitle="Predictable outcomes come from disciplined systems."
+              <PageWrap eyebrow="Approach" title="How we run work" subtitle="Predictable outcomes come from disciplined systems."
                 right={<Button variant="ghost" onClick={()=>setPage("contact")}>Start a build <Icon.ArrowRight className="h-4 w-4" /></Button>}
               >
                 <div className="grid gap-8 md:grid-cols-2">
                   <ProcessCards />
                   <GlassCard className="p-6">
                     <div className="text-sm font-semibold">Owner experience</div>
-                    <div className="mt-2 text-sm text-[#EDE7D9]/70">
-                      Tight scopes. Clean sequencing. Decisions made with context. Site stays disciplined.
-                    </div>
-                    <div className="mt-5 grid gap-3">
-                      {["Clear precon expectations", "Field execution that protects finishes", "Office cadence that keeps choices moving", "Turnover package you can actually use"].map(x=>(
-                        <div key={x} className="flex items-center gap-3 rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">
-                          <div className="rounded-xl border border-[#C9A24A]/25 bg-[#C9A24A]/6 p-1.5">
-                            <Icon.Check className="h-4 w-4 text-[#C9A24A]" />
-                          </div>
-                          <div className="text-sm text-[#EDE7D9]/75">{x}</div>
-                        </div>
-                      ))}
-                    </div>
+                    <div className="mt-2 text-sm text-[#EDE7D9]/70">Tight scopes. Clean sequencing. Decisions made with context. Site stays disciplined.</div>
                   </GlassCard>
                 </div>
               </PageWrap>
             ) : null}
 
             {page === "capabilities" ? (
-              <PageWrap
-                eyebrow="Capabilities"
-                title="What we build"
+              <PageWrap eyebrow="Capabilities" title="What we build"
                 subtitle="Luxury custom homes and major renovations, executed with building science fundamentals."
                 right={<Button variant="ghost" onClick={()=>setPage("contact")}>Talk scope <Icon.ArrowRight className="h-4 w-4" /></Button>}
               >
                 <div className="grid gap-6 md:grid-cols-2">
+                  <GlassCard className="p-6"><div className="text-sm font-semibold">Custom homes</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Full-service build management from precon through closeout.</div></GlassCard>
+                  <GlassCard className="p-6"><div className="text-sm font-semibold">Major renovations</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Structural and envelope work planned to protect the final product.</div></GlassCard>
+                  <GlassCard className="p-6 md:col-span-2"><div className="text-sm font-semibold">Team integration</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Work with your architect + designer, or we’ll help you interview and select partners.</div></GlassCard>
+                </div>
+              </PageWrap>
+            ) : null}
+
+            {page === "standards" ? (
+              <PageWrap eyebrow="Standards" title="The standard"
+                subtitle="A quiet, disciplined jobsite that protects schedule, craftsmanship, and finishes."
+                right={<Button variant="ghost" onClick={()=>setPage("contact")}>Start a build <Icon.ArrowRight className="h-4 w-4" /></Button>}
+              >
+                <div className="grid gap-6 md:grid-cols-2">
+                  {[
+                    { t:"Clarity", d:"Scopes written for accountability. No fuzzy handoffs." },
+                    { t:"Sequencing", d:"Work planned around long-lead items and critical path." },
+                    { t:"Clean logistics", d:"Material flow that keeps the site tight and safe." },
+                    { t:"Durable assemblies", d:"Building science fundamentals applied where it matters." },
+                  ].map(x=>(
+                    <GlassCard key={x.t} className="p-6">
+                      <div className="text-sm font-semibold">{x.t}</div>
+                      <div className="mt-2 text-sm text-[#EDE7D9]/70">{x.d}</div>
+                    </GlassCard>
+                  ))}
+                </div>
+              </PageWrap>
+            ) : null}
+
+            {page === "faq" ? (
+              <PageWrap eyebrow="FAQ" title="Answers upfront"
+                subtitle="The basics clients ask before we kick off."
+                right={<Button variant="ghost" onClick={()=>setPage("contact")}>Contact <Icon.ArrowRight className="h-4 w-4" /></Button>}
+              >
+                <FAQ />
+              </PageWrap>
+            ) : null}
+
+            {page === "contact" ? (
+              <PageWrap eyebrow="Contact" title="Let’s talk about your build"
+                subtitle="Jobsite math chatbot appears as the chat bubble (bottom-right)."
+              >
+                <div className="grid gap-8 md:grid-cols-2 md:items-start">
                   <GlassCard className="p-6">
-                    <div className="text-sm font-semibold">Custom homes</div>
-                    <div className="mt-2 text-sm text-[#EDE7D9]/70">
-                      Full-service build management from precon through closeout.
+                    <div className="text-sm font-semibold">Before we talk numbers</div>
+                    <div className="mt-3 grid gap-3 text-sm text-[#EDE7D9]/75">
+                      {["Where is the property?", "New build or major renovation?", "Architect/design team selected?", "Target start date?"].map(x=>(
+                        <div key={x} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">{x}</div>
+                      ))}
                     </div>
                   </GlassCard>
-                  <GlassCard className="p-6">
-                    <div className="text-sm font-semibold">Major renovations</div>
-                    <div className="mt-2 text-sm text-[#EDE7D9]/70">
-                      Structural and envelope work planned to protect the final product.
-                    </div>
-                  </GlassCard>
-                  <GlassCard className="p-6 md:col-span-2">
-                    <div className="text-sm font-semibold">Team integration</div>
-                    <div className="mt-2 text-sm text-[#EDE7D9]/70">
-                      Work with your architect + designer, or we’ll help you interview
+                  <ContactCard />
+                </div>
+              </PageWrap>
+            ) : null}
+
+            <footer className="relative border-t border-[#C9A24A]/20 bg-[#05110A]/85">
+              <div className="mx-auto max-w-6xl px-4 py-10">
+                <div className="grid gap-6 md:grid-cols-2 md:items-center">
+                  <div>
+                    <div className="text-sm font-semibold">{BRAND.name}</div>
+                    <div className="text-xs text-[#EDE7D9]/60">Veteran-owned • Luxury custom homes • {BRAND.city}</div>
+                  </div>
+                  <div className="flex flex-wrap gap-4 md:justify-end">
+                    {nav.map(n=>(
+                      <button key={n.id} onClick={()=>setPage(n.id)} className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55 hover:text-[#EDE7D9]">
+                        {n.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </footer>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>
