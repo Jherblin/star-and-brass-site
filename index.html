@@ -1,423 +1,677 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Star & Brass Group</title>
+import React, { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowRight, Check, Mail, MapPin, Phone, Star } from "lucide-react";
 
-    <!-- Tailwind (CDN) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+// ===== Brand =====
+const BRAND = {
+  name: "Star & Brass Group",
+  city: "Dallas, Texas",
+  phoneDisplay: "(469) 265-4633",
+  phoneHref: "tel:+14692654633",
+  emailDisplay: "Jimmy@starandbrassgroup.com",
+  emailHref: "mailto:Jimmy@starandbrassgroup.com",
+};
 
-    <!-- React (CDN) -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+// Chatling embed id from the snippet you provided
+const CHATLING_WIDGET_ID = "6976442446";
 
-    <!-- Babel (lets GitHub Pages run JSX without a build step) -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+// NOTE: The in-editor preview environment may repeatedly prompt for network access
+// and not persist the permission. To keep Preview stable, we disable external network
+// calls by default. When you deploy to your real domain, set this to true.
+const SHOULD_ENABLE_EMBEDS = (() => {
+  if (typeof window === "undefined") return false;
+  const h = (window.location && window.location.hostname) || "";
+  const isLocal = h === "localhost" || h === "127.0.0.1";
+  const isSandbox =
+    h.endsWith(".sandbox") ||
+    h.includes("sandbox") ||
+    h.includes("preview") ||
+    h.includes("internal");
+  return !(isLocal || isSandbox);
+})();
 
-    <style>
-      html, body { height: 100%; }
-      /* Prevent iOS fullscreen hijack for autoplay video */
-      video { display:block; }
-    </style>
-  </head>
+// ===== Small utils =====
+function cn(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
-  <body class="bg-[#071E12] text-[#EDE7D9]">
-    <div id="root"></div>
+const fadeUp = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+};
 
-    <script type="text/babel">
-      const { useEffect, useMemo, useState } = React;
+function Section({ className = "", children }) {
+  return <section className={cn("relative", className)}>{children}</section>;
+}
 
-      // ===== Brand =====
-      const BRAND = {
-        name: "Star & Brass Group",
-        city: "Dallas, Texas",
-        phoneDisplay: "(469) 265-4633",
-        phoneHref: "tel:+14692654633",
-        emailDisplay: "Jimmy@starandbrassgroup.com",
-        emailHref: "mailto:Jimmy@starandbrassgroup.com",
-      };
+function Divider() {
+  return (
+    <div className="relative">
+      <div className="mx-auto h-px w-full max-w-6xl bg-gradient-to-r from-transparent via-[#C9A24A]/20 to-transparent" />
+    </div>
+  );
+}
 
-      // Chatling embed id you provided
-      const CHATLING_WIDGET_ID = "6976442446";
+function Pill({ children }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-[#C9A24A]/25 bg-[#C9A24A]/6 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#EDE7D9]/80">
+      {children}
+    </span>
+  );
+}
 
-      const cn = (...c) => c.filter(Boolean).join(" ");
+function Button({
+  variant = "primary",
+  href,
+  onClick,
+  className = "",
+  children,
+}) {
+  const base =
+    "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold tracking-wide transition active:scale-[0.99]";
+  const styles = {
+    primary:
+      "bg-[#C9A24A] text-[#071E12] hover:bg-[#D7B66A] shadow-[0_12px_40px_rgba(201,162,74,0.14)]",
+    ghost:
+      "bg-transparent text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#C9A24A]/10",
+    dark:
+      "bg-[#05110A] text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#030A05]",
+  };
 
-      const Pill = ({ children }) => (
-        <span className="inline-flex items-center gap-2 rounded-full border border-[#C9A24A]/25 bg-[#C9A24A]/6 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#EDE7D9]/80">
-          {children}
-        </span>
-      );
+  const Comp = href ? "a" : "button";
+  return (
+    <Comp
+      href={href}
+      onClick={onClick}
+      className={cn(base, styles[variant], className)}
+    >
+      {children}
+    </Comp>
+  );
+}
 
-      const Button = ({ variant = "primary", href, onClick, className = "", children }) => {
-        const base =
-          "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold tracking-wide transition active:scale-[0.99]";
-        const styles = {
-          primary: "bg-[#C9A24A] text-[#071E12] hover:bg-[#D7B66A] shadow-[0_12px_40px_rgba(201,162,74,0.14)]",
-          ghost: "bg-transparent text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#C9A24A]/10",
-          dark: "bg-[#05110A] text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#030A05]",
-        };
-        const Comp = href ? "a" : "button";
-        return (
-          <Comp href={href} onClick={onClick} className={cn(base, styles[variant], className)}>
-            {children}
-          </Comp>
-        );
-      };
+function ContactForm() {
+  const inputBase =
+    "w-full rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 px-4 py-3 text-sm text-[#EDE7D9] placeholder:text-[#EDE7D9]/35 outline-none transition focus:border-[#C9A24A]/35";
 
-      const Divider = () => (
-        <div className="relative">
-          <div className="mx-auto h-px w-full max-w-6xl bg-gradient-to-r from-transparent via-[#C9A24A]/20 to-transparent" />
+  return (
+    <form
+      className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-6"
+      onSubmit={(e) => e.preventDefault()}
+    >
+      <div className="text-sm font-semibold">Send a note</div>
+      <div className="mt-4 grid gap-3">
+        <input className={inputBase} placeholder="Name" />
+        <input className={inputBase} placeholder="Email" />
+        <input className={inputBase} placeholder="Project address / area" />
+        <textarea
+          className={cn(inputBase, "min-h-[140px] resize-none")}
+          placeholder="Tell us what you're building"
+        />
+      </div>
+      <div className="mt-4">
+        <Button variant="primary" className="w-full">
+          Submit <ArrowRight className="h-4 w-4" />
+        </Button>
+      </div>
+      <div className="mt-3 text-xs text-[#EDE7D9]/55">
+        (Form placeholder — connect to Formspree/HubSpot when ready.)
+      </div>
+    </form>
+  );
+}
+
+function ConceptGallery() {
+  // These paths match the files you uploaded in the repo root (case-sensitive)
+  const items = useMemo(
+    () => [
+      {
+        title: "Material direction",
+        meta: "Brass, stone, warm woods",
+        img: "material.jpg",
+      },
+      {
+        title: "Elevation study",
+        meta: "Clean lines, deep shadows",
+        img: "Elevation.jpg",
+      },
+      {
+        title: "Lighting plan",
+        meta: "Layered, warm, restrained",
+        img: "lighting.jpg",
+      },
+      {
+        title: "Kitchen concept",
+        meta: "Real storage, real function",
+        img: "Kitchen.jpg",
+      },
+      {
+        title: "Bath concept",
+        meta: "Quiet luxury, durable",
+        img: "Bath.jpg",
+      },
+      {
+        title: "Outdoor living",
+        meta: "Dallas heat-ready",
+        img: "outdoor.jpg",
+      },
+    ],
+    []
+  );
+
+  return (
+    <div className="grid gap-4 md:grid-cols-3">
+      {items.map((it, idx) => (
+        <motion.div
+          key={it.title}
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.55, delay: idx * 0.03 }}
+          className="relative overflow-hidden rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4"
+        >
+          <div className="relative aspect-[4/3] w-full">
+            <div className="absolute inset-0 bg-[radial-gradient(900px_400px_at_20%_10%,rgba(201,162,74,0.18),transparent_55%),radial-gradient(700px_350px_at_80%_30%,rgba(237,231,217,0.10),transparent_55%),linear-gradient(180deg,rgba(3,10,5,0.35),rgba(7,30,18,0.85))]" />
+            <img
+              src={it.img}
+              alt={it.title}
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/75 via-[#071E12]/20 to-transparent" />
+            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20" />
+          </div>
+          <div className="p-5">
+            <div className="text-sm font-semibold text-[#EDE7D9]">{it.title}</div>
+            <div className="mt-1 text-xs text-[#EDE7D9]/60">{it.meta}</div>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+function VisualDirectionVideo() {
+  // Relative path for GitHub Pages project site
+  const VIDEO_SRC = "estate-sweep.mp4";
+  return (
+    <div className="relative overflow-hidden rounded-[32px] border border-[#C9A24A]/20 bg-[#C9A24A]/4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
+      <div className="aspect-video w-full">
+        <video
+          className="h-full w-full object-cover"
+          src={VIDEO_SRC}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+        />
+      </div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/80 via-transparent to-transparent" />
+      <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20" />
+    </div>
+  );
+}
+
+export default function StarAndBrassLanding() {
+  const [menu, setMenu] = useState(false);
+  const [page, setPage] = useState("home");
+  const [chatEnabled, setChatEnabled] = useState(false);
+
+  const nav = useMemo(
+    () => [
+      { id: "home", label: "Home" },
+      { id: "contact", label: "Contact" },
+    ],
+    []
+  );
+
+  const go = (to) => {
+    setMenu(false);
+    setPage(to);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Chatling: show ONLY on Home + Contact
+  useEffect(() => {
+    const allowPage = page === "home" || page === "contact";
+    const shouldLoad = allowPage && (SHOULD_ENABLE_EMBEDS || chatEnabled);
+    if (!shouldLoad) return;
+    if (!CHATLING_WIDGET_ID) return;
+
+    window.chtlConfig = { chatbotId: CHATLING_WIDGET_ID };
+
+    if (!document.getElementById("chtl-script")) {
+      const s = document.createElement("script");
+      s.async = true;
+      s.type = "text/javascript";
+      s.id = "chtl-script";
+      s.setAttribute("data-id", CHATLING_WIDGET_ID);
+      s.src = "https://chatling.ai/js/embed.js";
+      document.body.appendChild(s);
+    }
+  }, [page, chatEnabled]);
+
+  const NavLinks = ({ className = "" }) => (
+    <div className={cn("flex items-center gap-6", className)}>
+      {nav.map((n) => (
+        <button
+          key={n.id}
+          onClick={() => go(n.id)}
+          className={cn(
+            "text-[11px] font-semibold tracking-[0.22em] uppercase transition",
+            page === n.id
+              ? "text-[#C9A24A]"
+              : "text-[#EDE7D9]/70 hover:text-[#EDE7D9]"
+          )}
+        >
+          {n.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  const PageShell = ({ eyebrow, title, subtitle, right, children }) => (
+    <div className="mx-auto max-w-6xl px-4 pb-16 pt-10">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        transition={{ duration: 0.55 }}
+        className="grid gap-8 md:grid-cols-2 md:items-end"
+      >
+        <div>
+          <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">
+            {eyebrow}
+          </div>
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
+            {title}
+          </h1>
+          {subtitle ? (
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">
+              {subtitle}
+            </p>
+          ) : null}
         </div>
-      );
+        {right || null}
+      </motion.div>
+      <div className="mt-8">{children}</div>
+    </div>
+  );
 
-      function VisualDirectionVideo() {
-        // IMPORTANT: relative path so it works on https://.../star-and-brass-site/
-        const VIDEO_SRC = "estate-sweep.mp4";
+  return (
+    <div className="min-h-screen bg-[#071E12] text-[#EDE7D9]">
+      <div className="pointer-events-none fixed inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_15%_10%,rgba(201,162,74,0.10),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(700px_450px_at_85%_30%,rgba(201,162,74,0.08),transparent_60%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#071E12] via-[#05110A] to-[#030A05]" />
+      </div>
 
-        return (
-          <div className="relative overflow-hidden rounded-[32px] border border-[#C9A24A]/20 bg-[#C9A24A]/4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
-            <div className="aspect-video w-full">
-              <video
-                className="h-full w-full object-cover"
-                src={VIDEO_SRC}
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-              ></video>
-            </div>
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/80 via-transparent to-transparent"></div>
-            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
-          </div>
-        );
-      }
-
-      function ConceptGallery() {
-        // IMPORTANT: relative paths (no leading /)
-        const items = useMemo(
-          () => [
-            { title: "Material direction", meta: "Brass, stone, warm woods", img: "concept/material.jpg" },
-            { title: "Elevation study", meta: "Clean lines, deep shadows", img: "concept/elevation.jpg" },
-            { title: "Lighting plan", meta: "Layered, warm, restrained", img: "concept/lighting.jpg" },
-            { title: "Kitchen concept", meta: "Real storage, real function", img: "concept/kitchen.jpg" },
-            { title: "Bath concept", meta: "Quiet luxury, durable", img: "concept/bath.jpg" },
-            { title: "Outdoor living", meta: "Dallas heat-ready", img: "concept/outdoor.jpg" },
-          ],
-          []
-        );
-
-        return (
-          <div className="grid gap-4 md:grid-cols-3">
-            {items.map((it) => (
-              <div key={it.title} className="relative overflow-hidden rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4">
-                <div className="relative aspect-[4/3] w-full">
-                  <div className="absolute inset-0 bg-[radial-gradient(900px_400px_at_20%_10%,rgba(201,162,74,0.18),transparent_55%),radial-gradient(700px_350px_at_80%_30%,rgba(237,231,217,0.10),transparent_55%),linear-gradient(180deg,rgba(3,10,5,0.35),rgba(7,30,18,0.85))]"></div>
-
-                  <img
-                    src={it.img}
-                    alt={it.title}
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
-
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/75 via-[#071E12]/20 to-transparent"></div>
-                  <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
-                </div>
-
-                <div className="p-5">
-                  <div className="text-sm font-semibold text-[#EDE7D9]">{it.title}</div>
-                  <div className="mt-1 text-xs text-[#EDE7D9]/60">{it.meta}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        );
-      }
-
-      function ContactCard() {
-        return (
-          <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-6">
-            <div className="text-sm font-semibold">Contact</div>
-
-            <div className="mt-4 grid gap-3">
-              <a
-                href={BRAND.phoneHref}
-                className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10"
-              >
-                <div>
-                  <div className="text-sm font-semibold">Call</div>
-                  <div className="text-sm text-[#EDE7D9]/70">{BRAND.phoneDisplay}</div>
-                </div>
-                <div className="text-[#EDE7D9]/60">→</div>
-              </a>
-
-              <a
-                href={BRAND.emailHref}
-                className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10"
-              >
-                <div>
-                  <div className="text-sm font-semibold">Email</div>
-                  <div className="text-sm text-[#EDE7D9]/70">{BRAND.emailDisplay}</div>
-                </div>
-                <div className="text-[#EDE7D9]/60">→</div>
-              </a>
-
-              <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5">
-                <div className="text-sm font-semibold">Service areas</div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  <Pill>Highland Park</Pill>
-                  <Pill>Preston Hollow</Pill>
-                  <Pill>Historic Old East Dallas</Pill>
-                </div>
+      <header className="sticky top-0 z-50 border-b border-[#C9A24A]/20 bg-[#071E12]/75 backdrop-blur">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+          <button onClick={() => go("home")} className="flex items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center rounded-2xl border border-[#C9A24A]/20 bg-[#C9A24A]/4">
+              <div className="grid h-6 w-6 place-items-center rounded-xl border border-[#C9A24A]/25 bg-[#C9A24A]/10 text-[10px] font-semibold text-[#C9A24A]">
+                LOGO
               </div>
             </div>
-          </div>
-        );
-      }
-
-      function App() {
-        const [page, setPage] = useState("home");
-
-        // Chatling: load on Home + Contact only (and only once)
-        useEffect(() => {
-          if (!(page === "home" || page === "contact")) return;
-          if (!CHATLING_WIDGET_ID) return;
-
-          window.chtlConfig = { chatbotId: CHATLING_WIDGET_ID };
-
-          if (!document.getElementById("chtl-script")) {
-            const s = document.createElement("script");
-            s.async = true;
-            s.type = "text/javascript";
-            s.id = "chtl-script";
-            s.setAttribute("data-id", CHATLING_WIDGET_ID);
-            s.src = "https://chatling.ai/js/embed.js";
-            document.body.appendChild(s);
-          }
-        }, [page]);
-
-        return (
-          <div className="min-h-screen">
-            {/* Background */}
-            <div className="pointer-events-none fixed inset-0">
-              <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_15%_10%,rgba(201,162,74,0.10),transparent_60%)]"></div>
-              <div className="absolute inset-0 bg-[radial-gradient(700px_450px_at_85%_30%,rgba(201,162,74,0.08),transparent_60%)]"></div>
-              <div className="absolute inset-0 bg-gradient-to-b from-[#071E12] via-[#05110A] to-[#030A05]"></div>
+            <div className="leading-tight">
+              <div className="text-base font-semibold md:text-lg">{BRAND.name}</div>
+              <div className="text-sm text-[#EDE7D9]/60">{BRAND.city}</div>
             </div>
+          </button>
 
-            {/* Top Nav */}
-            <header className="sticky top-0 z-50 border-b border-[#C9A24A]/20 bg-[#071E12]/75 backdrop-blur">
-              <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-                <button onClick={() => setPage("home")} className="text-left">
-                  <div className="text-lg font-semibold">{BRAND.name}</div>
-                  <div className="text-sm text-[#EDE7D9]/60">{BRAND.city}</div>
-                </button>
+          <nav className="hidden md:block">
+            <NavLinks />
+          </nav>
 
-                <nav className="hidden md:flex items-center gap-6">
+          <div className="hidden items-center gap-3 md:flex">
+            <Button variant="ghost" href={BRAND.phoneHref}>
+              <Phone className="h-4 w-4" />
+              Call
+            </Button>
+            <Button variant="primary" onClick={() => go("contact")}>
+              Start a build <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <button
+            onClick={() => setMenu((s) => !s)}
+            className="grid h-10 w-10 place-items-center rounded-2xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 md:hidden"
+            aria-label="Open menu"
+          >
+            <div className="space-y-1">
+              <div className="h-0.5 w-5 bg-[#EDE7D9]/70" />
+              <div className="h-0.5 w-5 bg-[#EDE7D9]/70" />
+              <div className="h-0.5 w-5 bg-[#EDE7D9]/70" />
+            </div>
+          </button>
+        </div>
+
+        {menu ? (
+          <div className="border-t border-[#C9A24A]/20 bg-[#05110A]/85 backdrop-blur md:hidden">
+            <div className="mx-auto max-w-6xl px-4 py-3">
+              <div className="grid gap-2">
+                {nav.map((n) => (
                   <button
-                    onClick={() => setPage("home")}
+                    key={n.id}
+                    onClick={() => go(n.id)}
                     className={cn(
-                      "text-[11px] font-semibold tracking-[0.22em] uppercase transition",
-                      page === "home" ? "text-[#C9A24A]" : "text-[#EDE7D9]/70 hover:text-[#EDE7D9]"
+                      "rounded-2xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 px-4 py-3 text-left text-sm",
+                      page === n.id && "bg-[#C9A24A]/10"
                     )}
                   >
-                    home
+                    {n.label}
                   </button>
-                  <button
-                    onClick={() => setPage("contact")}
-                    className={cn(
-                      "text-[11px] font-semibold tracking-[0.22em] uppercase transition",
-                      page === "contact" ? "text-[#C9A24A]" : "text-[#EDE7D9]/70 hover:text-[#EDE7D9]"
-                    )}
-                  >
-                    contact
-                  </button>
-                </nav>
-
-                <div className="flex items-center gap-3">
-                  <Button variant="ghost" href={BRAND.phoneHref}>Call</Button>
-                  <Button variant="primary" onClick={() => setPage("contact")}>Start a build</Button>
-                </div>
+                ))}
               </div>
-            </header>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <Button variant="ghost" href={BRAND.phoneHref} className="w-full">
+                  <Phone className="h-4 w-4" />
+                  Call
+                </Button>
+                <Button variant="primary" className="w-full" onClick={() => go("contact")}>
+                  Start <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </header>
 
-            {/* Content */}
-            <main className="relative">
-              {page === "home" ? (
-                <>
-                  <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-12 pt-10 md:grid-cols-2 md:items-center md:pb-16">
-                    <div>
-                      <div className="flex flex-wrap gap-2">
-                        <Pill>Luxury custom homebuilder</Pill>
-                        <Pill>Veteran-owned</Pill>
-                        <Pill>{BRAND.city}</Pill>
+      <main className="relative">
+        {page === "home" ? (
+          <Section className="pt-10">
+            <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-12 pt-8 md:grid-cols-2 md:items-center md:pb-16">
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                transition={{ duration: 0.7 }}
+              >
+                <div className="flex flex-wrap gap-2">
+                  <Pill>Luxury custom homebuilder</Pill>
+                  <Pill>Veteran-owned</Pill>
+                  <Pill>{BRAND.city}</Pill>
+                </div>
+
+                <h1 className="mt-6 text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+                  We build homes you don’t forget.
+                </h1>
+
+                <p className="mt-5 max-w-xl text-base leading-relaxed text-[#EDE7D9]/70 md:text-lg">
+                  Star &amp; Brass Group is a Dallas-based startup run by two Marine Corps veterans.
+                  We bring building science fundamentals and hands-on experience across building materials,
+                  multifamily, production luxury townhomes, semi-custom, and full luxury custom homes—typically
+                  starting around $700/sf on a cost-plus basis.
+                </p>
+
+                <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                  <Button variant="primary" onClick={() => go("contact")}>
+                    Request a consult <ArrowRight className="h-4 w-4" />
+                  </Button>
+                  {!SHOULD_ENABLE_EMBEDS && !chatEnabled ? (
+                    <Button variant="ghost" onClick={() => setChatEnabled(true)}>
+                      Open jobsite math chat <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  ) : null}
+                </div>
+
+                <div className="mt-8 rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5">
+                  <div className="text-sm font-semibold">
+                    Build your dream with detail-oriented building science professionals.
+                  </div>
+                  <div className="mt-1 text-sm text-[#EDE7D9]/70">
+                    Clear decisions, disciplined execution, and a team built to protect the standard.
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.8 }}
+                className="relative"
+              >
+                <div className="relative overflow-hidden rounded-[32px] border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
+                  <div className="rounded-[28px] border border-[#C9A24A]/20 bg-gradient-to-br from-[#C9A24A]/12 via-[#C9A24A]/7 to-transparent p-5">
+                    <div className="flex items-center justify-between">
+                      <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/60">
+                        Startup, serious systems
                       </div>
-
-                      <h1 className="mt-6 text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
-                        We build homes you don’t forget.
-                      </h1>
-
-                      <p className="mt-5 max-w-xl text-base leading-relaxed text-[#EDE7D9]/70 md:text-lg">
-                        Star &amp; Brass Group is a Dallas-based startup run by two Marine Corps veterans.
-                        We bring building science fundamentals and hands-on experience across building materials,
-                        multifamily, production luxury townhomes, semi-custom, and full luxury custom homes—typically
-                        starting around $700/sf on a cost-plus basis.
-                      </p>
-
-                      <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                        <Button variant="primary" onClick={() => setPage("contact")}>
-                          Request a consult
-                        </Button>
-                        <Button variant="ghost" href={BRAND.emailHref}>
-                          Email us
-                        </Button>
-                      </div>
-
-                      <div className="mt-8 rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5">
-                        <div className="text-sm font-semibold">
-                          Build your dream with detail-oriented building science professionals.
-                        </div>
-                        <div className="mt-1 text-sm text-[#EDE7D9]/70">
-                          Clear decisions, disciplined execution, and a team built to protect the standard.
-                        </div>
-                      </div>
+                      <Pill>
+                        <Check className="h-3.5 w-3.5" />
+                        Owner-first
+                      </Pill>
                     </div>
 
-                    <div className="relative">
-                      <div className="rounded-[32px] border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
-                        <div className="rounded-[28px] border border-[#C9A24A]/20 bg-gradient-to-br from-[#C9A24A]/12 via-[#C9A24A]/7 to-transparent p-5">
-                          <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/60">
-                            Startup, serious systems
-                          </div>
-
-                          <div className="mt-6 grid gap-3">
-                            {[
-                              {
-                                k: "1. Pre Construction Planning",
-                                v: "Initial meetings with your architect/design team—or an interview process with our preferred partners.",
-                              },
-                              {
-                                k: "2. Field Mindset",
-                                v: "Set trades up for success through clarity: clean scopes, sequencing, and jobsite readiness.",
-                              },
-                              {
-                                k: "3. Office Mindset",
-                                v: "Weekly homeowner meetings for updates and selections approvals. Timely purchase orders so materials are onsite when needed.",
-                              },
-                              {
-                                k: "4. Detailed Home Delivery",
-                                v: "A fully searchable digital turnover package with warranties, trade contacts, final build sheet, and appliance documentation.",
-                              },
-                            ].map((row) => (
-                              <div key={row.k} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">
-                                <div className="text-sm font-semibold">{row.k}</div>
-                                <div className="mt-1 text-sm text-[#EDE7D9]/70">{row.v}</div>
-                              </div>
-                            ))}
-                          </div>
+                    <div className="mt-6 grid gap-3">
+                      {[
+                        {
+                          k: "1. Pre Construction Planning",
+                          v: "Initial meetings with your architect/design team—or an interview process with our preferred partners.",
+                        },
+                        {
+                          k: "2. Field Mindset",
+                          v: "Set trades up for success through clarity: clean scopes, sequencing, and jobsite readiness.",
+                        },
+                        {
+                          k: "3. Office Mindset",
+                          v: "Weekly homeowner meetings for updates and selections approvals. Timely purchase orders so materials are onsite when needed.",
+                        },
+                        {
+                          k: "4. Detailed Home Delivery",
+                          v: "A fully searchable digital turnover package with warranties, trade contacts, final build sheet, and appliance documentation.",
+                        },
+                      ].map((row) => (
+                        <div
+                          key={row.k}
+                          className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4"
+                        >
+                          <div className="text-sm font-semibold">{row.k}</div>
+                          <div className="mt-1 text-sm text-[#EDE7D9]/70">{row.v}</div>
                         </div>
-                      </div>
+                      ))}
+                    </div>
 
-                      <div className="pointer-events-none absolute -inset-8 -z-10 opacity-60 blur-3xl">
-                        <div className="h-full w-full rounded-[44px] bg-[radial-gradient(circle_at_60%_40%,rgba(201,162,74,0.12),transparent_55%)]"></div>
-                      </div>
+                    <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                      <Button variant="dark" href={BRAND.emailHref} className="w-full">
+                        <Mail className="h-4 w-4" />
+                        Email us
+                      </Button>
+                      <Button variant="ghost" href={BRAND.phoneHref} className="w-full">
+                        <Phone className="h-4 w-4" />
+                        Call now
+                      </Button>
                     </div>
                   </div>
+                </div>
 
-                  <Divider />
+                <div className="pointer-events-none absolute -inset-8 -z-10 opacity-60 blur-3xl">
+                  <div className="h-full w-full rounded-[44px] bg-[radial-gradient(circle_at_60%_40%,rgba(201,162,74,0.12),transparent_55%)]" />
+                </div>
+              </motion.div>
+            </div>
 
-                  <div className="mx-auto max-w-6xl px-4 py-14">
-                    <div className="grid gap-8 md:grid-cols-2 md:items-end">
+            <Divider />
+
+            <div className="mx-auto max-w-6xl px-4 py-14">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                variants={fadeUp}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.6 }}
+                className="grid gap-8 md:grid-cols-2 md:items-end"
+              >
+                <div>
+                  <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">
+                    Visual direction
+                  </div>
+                  <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
+                    Cinematic concept, photo-ready standards
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">
+                    We’re a startup, so we won’t borrow photos from past employers. Until our first builds are shot, we show concept media and material direction to communicate taste and standards.
+                  </p>
+                </div>
+                <div className="flex justify-start md:justify-end">
+                  <Button variant="ghost" onClick={() => go("contact")}>
+                    Talk scope <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </motion.div>
+
+              <div className="mt-8">
+                <VisualDirectionVideo />
+                <div className="mt-6">
+                  <ConceptGallery />
+                </div>
+              </div>
+            </div>
+          </Section>
+        ) : null}
+
+        {page === "contact" ? (
+          <PageShell
+            eyebrow="Start here"
+            title="Let’s talk about your build"
+            subtitle="Tell us the basics. We’ll respond with next steps."
+            right={
+              <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-6">
+                <div className="text-sm font-semibold">Contact</div>
+                <div className="mt-4 grid gap-3">
+                  <a
+                    href={BRAND.phoneHref}
+                    className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                        <Phone className="h-5 w-5 text-[#C9A24A]" />
+                      </div>
                       <div>
-                        <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">
-                          Visual direction
-                        </div>
-                        <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-                          Cinematic concept, photo-ready standards
-                        </h2>
-                        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">
-                          We’re a startup, so we won’t borrow photos from past employers. Until our first builds are shot,
-                          we show concept media and material direction to communicate taste and standards.
-                        </p>
-                      </div>
-                      <div className="flex justify-start md:justify-end">
-                        <Button variant="ghost" onClick={() => setPage("contact")}>Talk scope</Button>
+                        <div className="text-sm font-semibold">Call</div>
+                        <div className="text-sm text-[#EDE7D9]/70">{BRAND.phoneDisplay}</div>
                       </div>
                     </div>
+                    <ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
+                  </a>
 
-                    <div className="mt-8">
-                      <VisualDirectionVideo />
-                      <div className="mt-6">
-                        <ConceptGallery />
+                  <a
+                    href={BRAND.emailHref}
+                    className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                        <Mail className="h-5 w-5 text-[#C9A24A]" />
                       </div>
+                      <div>
+                        <div className="text-sm font-semibold">Email</div>
+                        <div className="text-sm text-[#EDE7D9]/70">{BRAND.emailDisplay}</div>
+                      </div>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
+                  </a>
+
+                  <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                        <MapPin className="h-5 w-5 text-[#C9A24A]" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold">Service areas</div>
+                        <div className="text-sm text-[#EDE7D9]/70">Dallas</div>
+                      </div>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Pill>Highland Park</Pill>
+                      <Pill>Preston Hollow</Pill>
+                      <Pill>Historic Old East Dallas</Pill>
                     </div>
                   </div>
-                </>
-              ) : null}
 
-              {page === "contact" ? (
-                <div className="mx-auto max-w-6xl px-4 pb-16 pt-10">
-                  <div className="grid gap-8 md:grid-cols-2 md:items-start">
-                    <div>
-                      <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">
-                        Start here
+                  {!SHOULD_ENABLE_EMBEDS && !chatEnabled ? (
+                    <Button
+                      variant="ghost"
+                      className="w-full"
+                      onClick={() => setChatEnabled(true)}
+                    >
+                      Open jobsite math chat <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            }
+          >
+            <div className="grid gap-10 md:grid-cols-2">
+              <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-6">
+                <div className="text-sm font-semibold">Before we talk numbers</div>
+                <p className="mt-2 text-sm leading-relaxed text-[#EDE7D9]/70">
+                  We’ll ask a few quick questions to make sure the scope, decision cadence, and standards match.
+                </p>
+                <div className="mt-5 grid gap-3">
+                  {[
+                    "Where is the property?",
+                    "New build or major renovation?",
+                    "Architect/design team selected?",
+                    "Target start date?",
+                  ].map((x) => (
+                    <div
+                      key={x}
+                      className="flex items-center gap-3 rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4"
+                    >
+                      <div className="rounded-xl border border-[#C9A24A]/25 bg-[#C9A24A]/6 p-1.5">
+                        <Check className="h-4 w-4 text-[#C9A24A]" />
                       </div>
-                      <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
-                        Let’s talk about your build
-                      </h1>
-                      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">
-                        Tell us the basics. We’ll respond with next steps.
-                      </p>
-
-                      <div className="mt-6 rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-6">
-                        <div className="text-sm font-semibold">Before we talk numbers</div>
-                        <div className="mt-3 grid gap-3 text-sm text-[#EDE7D9]/75">
-                          <div className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">Where is the property?</div>
-                          <div className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">New build or major renovation?</div>
-                          <div className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">Architect/design team selected?</div>
-                          <div className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">Target start date?</div>
-                        </div>
-                      </div>
+                      <div className="text-sm text-[#EDE7D9]/75">{x}</div>
                     </div>
+                  ))}
+                </div>
+              </div>
+              <ContactForm />
+            </div>
+          </PageShell>
+        ) : null}
 
-                    <ContactCard />
+        <footer className="relative border-t border-[#C9A24A]/20 bg-[#05110A]/85">
+          <div className="mx-auto max-w-6xl px-4 py-10">
+            <div className="grid gap-8 md:grid-cols-2 md:items-center">
+              <div className="flex items-center gap-3">
+                <div className="grid h-11 w-11 place-items-center rounded-2xl border border-[#C9A24A]/20 bg-[#C9A24A]/4">
+                  <Star className="h-5 w-5 text-[#C9A24A]" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold">{BRAND.name}</div>
+                  <div className="text-xs text-[#EDE7D9]/60">
+                    Veteran-owned • Luxury custom homes • {BRAND.city}
                   </div>
                 </div>
-              ) : null}
+              </div>
 
-              <footer className="relative border-t border-[#C9A24A]/20 bg-[#05110A]/85">
-                <div className="mx-auto max-w-6xl px-4 py-10">
-                  <div className="grid gap-6 md:grid-cols-2 md:items-center">
-                    <div>
-                      <div className="text-sm font-semibold">{BRAND.name}</div>
-                      <div className="text-xs text-[#EDE7D9]/60">
-                        Veteran-owned • Luxury custom homes • {BRAND.city}
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-2 md:items-end">
-                      <div className="flex gap-4 text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">
-                        <button onClick={() => setPage("home")} className="hover:text-[#EDE7D9]">home</button>
-                        <button onClick={() => setPage("contact")} className="hover:text-[#EDE7D9]">contact</button>
-                      </div>
-                      <div className="text-xs text-[#EDE7D9]/55">
-                        © {new Date().getFullYear()} {BRAND.name}. All rights reserved.
-                      </div>
-                    </div>
-                  </div>
+              <div className="flex flex-col gap-3 md:items-end">
+                <div className="flex flex-wrap gap-4">
+                  {nav.map((n) => (
+                    <button
+                      key={n.id}
+                      onClick={() => go(n.id)}
+                      className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55 hover:text-[#EDE7D9]"
+                    >
+                      {n.label}
+                    </button>
+                  ))}
                 </div>
-              </footer>
-            </main>
+                <div className="text-xs text-[#EDE7D9]/55">
+                  © {new Date().getFullYear()} {BRAND.name}. All rights reserved.
+                </div>
+              </div>
+            </div>
           </div>
-        );
-      }
-
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-    </script>
-  </body>
-</html>
+        </footer>
+      </main>
+    </div>
+  );
+}
