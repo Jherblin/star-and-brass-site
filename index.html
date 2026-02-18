@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Star & Brass Group</title>
+
+    <!-- Tailwind via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- React + ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel (lets you paste JSX directly) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      /* optional: makes video nicer */
+      html, body { height: 100%; }
+    </style>
+  </head>
+  <body class="bg-[#071E12] text-[#EDE7D9]">
+    <div id="root"></div>
+
+    <!-- Your app code goes here -->
+    <script type="text/babel">
+      const { useEffect, useMemo, useState } = React;
+
+      // ===== Brand =====
+      const BRAND = {
+        name: "Star & Brass Group",
+        city: "Dallas, Texas",
+        phoneDisplay: "(469) 265-4633",
+        phoneHref: "tel:+14692654633",
+        emailDisplay: "Jimmy@starandbrassgroup.com",
+        emailHref: "mailto:Jimmy@starandbrassgroup.com",
+      };
+
+      // Chatling ID
+      const CHATLING_WIDGET_ID = "6976442446";
+
+      function cn(...classes) { return classes.filter(Boolean).join(" "); }
+
+      function Pill({ children }) {
+        return (
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#C9A24A]/25 bg-[#C9A24A]/6 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#EDE7D9]/80">
+            {children}
+          </span>
+        );
+      }
+
+      function Button({ variant="primary", href, onClick, className="", children }) {
+        const base = "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold tracking-wide transition active:scale-[0.99]";
+        const styles = {
+          primary: "bg-[#C9A24A] text-[#071E12] hover:bg-[#D7B66A]",
+          ghost: "bg-transparent text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#C9A24A]/10",
+          dark: "bg-[#05110A] text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#030A05]",
+        };
+        const Comp = href ? "a" : "button";
+        return <Comp href={href} onClick={onClick} className={cn(base, styles[variant], className)}>{children}</Comp>;
+      }
+
+      function VisualDirectionVideo() {
+        // Put estate-sweep.mp4 in the repo root later (or replace with a hosted URL)
+        const VIDEO_SRC = "estate-sweep.mp4";
+        return (
+          <div className="relative overflow-hidden rounded-[32px] border border-[#C9A24A]/20 bg-[#C9A24A]/4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
+            <div className="aspect-video w-full">
+              <video className="h-full w-full object-cover"
+                src={VIDEO_SRC} autoPlay loop muted playsInline preload="auto" />
+            </div>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/80 via-transparent to-transparent" />
+          </div>
+        );
+      }
+
+      function ConceptGallery() {
+        const items = [
+          { title:"Material direction", img:"concept/material.jpg" },
+          { title:"Elevation study", img:"concept/elevation.jpg" },
+          { title:"Lighting plan", img:"concept/lighting.jpg" },
+          { title:"Kitchen concept", img:"concept/kitchen.jpg" },
+          { title:"Bath concept", img:"concept/bath.jpg" },
+          { title:"Outdoor living", img:"concept/outdoor.jpg" },
+        ];
+        return (
+          <div className="grid gap-4 md:grid-cols-3">
+            {items.map((it) => (
+              <div key={it.title} className="overflow-hidden rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4">
+                <div className="relative aspect-[4/3]">
+                  <img src={it.img} className="absolute inset-0 h-full w-full object-cover"
+                    onError={(e)=>{ e.currentTarget.style.display="none"; }} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#071E12]/75 via-[#071E12]/10 to-transparent" />
+                </div>
+                <div className="p-5 text-sm font-semibold">{it.title}</div>
+              </div>
+            ))}
+          </div>
+        );
+      }
+
+      function App(){
+        const [page, setPage] = useState("home");
+
+        // Load Chatling ONLY on Home + Contact
+        useEffect(() => {
+          const allowPage = page === "home" || page === "contact";
+          if (!allowPage) return;
+
+          window.chtlConfig = { chatbotId: CHATLING_WIDGET_ID };
+          if (!document.getElementById("chtl-script")) {
+            const s = document.createElement("script");
+            s.async = true;
+            s.id = "chtl-script";
+            s.setAttribute("data-id", CHATLING_WIDGET_ID);
+            s.src = "https://chatling.ai/js/embed.js";
+            document.body.appendChild(s);
+          }
+        }, [page]);
+
+        return (
+          <div className="min-h-screen">
+            <header className="sticky top-0 z-50 border-b border-[#C9A24A]/20 bg-[#071E12]/75 backdrop-blur">
+              <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+                <button onClick={()=>setPage("home")} className="text-left">
+                  <div className="text-lg font-semibold">{BRAND.name}</div>
+                  <div className="text-sm text-[#EDE7D9]/60">{BRAND.city}</div>
+                </button>
+                <div className="hidden md:flex gap-6 text-[11px] font-semibold uppercase tracking-[0.22em]">
+                  {["home","contact"].map(id=>(
+                    <button key={id} onClick={()=>setPage(id)} className={page===id?"text-[#C9A24A]":"text-[#EDE7D9]/70 hover:text-[#EDE7D9]"}>
+                      {id}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="ghost" href={BRAND.phoneHref}>Call</Button>
+                  <Button variant="primary" onClick={()=>setPage("contact")}>Start a build</Button>
+                </div>
+              </div>
+            </header>
+
+            <main className="mx-auto max-w-6xl px-4 py-10">
+              {page==="home" && (
+                <>
+                  <div className="flex flex-wrap gap-2">
+                    <Pill>Luxury custom homebuilder</Pill>
+                    <Pill>Veteran-owned</Pill>
+                    <Pill>{BRAND.city}</Pill>
+                  </div>
+
+                  <h1 className="mt-6 text-4xl md:text-6xl font-semibold tracking-tight">
+                    We build homes you don’t forget.
+                  </h1>
+
+                  <p className="mt-4 max-w-2xl text-[#EDE7D9]/70">
+                    Dallas-based startup run by two Marine Corps veterans. Building science mindset, disciplined execution, luxury results.
+                  </p>
+
+                  <div className="mt-8">
+                    <VisualDirectionVideo />
+                  </div>
+
+                  <div className="mt-6">
+                    <ConceptGallery />
+                  </div>
+                </>
+              )}
+
+              {page==="contact" && (
+                <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-6">
+                  <div className="text-xl font-semibold">Contact</div>
+                  <div className="mt-3 text-[#EDE7D9]/70">
+                    <div><a href={BRAND.phoneHref}>Call: {BRAND.phoneDisplay}</a></div>
+                    <div><a href={BRAND.emailHref}>Email: {BRAND.emailDisplay}</a></div>
+                  </div>
+                </div>
+              )}
+            </main>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>
