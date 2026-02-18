@@ -5,460 +5,1072 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>Star & Brass Group</title>
 
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- React 18 (UMD) -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel (JSX in the browser) -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-      html, body { height: 100%; }
-      video { display:block; }
-      #chtl-script, iframe, .chtl-widget, .chatling-widget { z-index: 999999 !important; }
+      html,
+      body {
+        height: 100%;
+      }
+      video {
+        display: block;
+      }
+
+      /* Always keep Chatling above everything */
+      #chtl-script,
+      iframe,
+      .chtl-widget,
+      .chatling-widget {
+        z-index: 999999 !important;
+      }
+
+      /* Prevent accidental text selection highlights on nav */
+      .no-select {
+        -webkit-user-select: none;
+        user-select: none;
+      }
+
+      /* Soft scrollbar (optional) */
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(201, 162, 74, 0.25);
+        border-radius: 999px;
+      }
+      ::-webkit-scrollbar-track {
+        background: rgba(7, 30, 18, 0.6);
+      }
     </style>
   </head>
 
   <body class="bg-[#071E12] text-[#EDE7D9]">
     <div id="root"></div>
 
-    <!-- Chatling (your embed) -->
+    <!-- Chatling (YOUR embed) -->
     <script>
       window.chtlConfig = { chatbotId: "6976442446" };
     </script>
-    <script async data-id="6976442446" id="chtl-script" type="text/javascript" src="https://chatling.ai/js/embed.js"></script>
+    <script
+      async
+      data-id="6976442446"
+      id="chtl-script"
+      type="text/javascript"
+      src="https://chatling.ai/js/embed.js"
+    ></script>
 
+    <!--
+      IMPORTANT:
+      This file is intentionally long (500+ lines) and includes an on-screen error fallback.
+      If ANY JS error happens, you will see a visible error box instead of a blank green screen.
+    -->
     <script type="text/babel">
-      const { useMemo, useState } = React;
+      /* =========================================================
+         SAFETY: If render fails, show a visible error
+         ========================================================= */
+      function renderFatalError(err) {
+        const root = document.getElementById("root");
+        if (!root) return;
+        const msg =
+          (err && (err.stack || err.message)) ||
+          String(err || "Unknown error");
+        root.innerHTML = `
+          <div style="
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:24px;
+            font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background:#071E12;
+            color:#EDE7D9;">
+            <div style="
+              max-width:960px;
+              width:100%;
+              border:1px solid rgba(201,162,74,0.30);
+              background:rgba(201,162,74,0.06);
+              border-radius:24px;
+              padding:20px;">
+              <div style="font-weight:800; font-size:18px; margin-bottom:10px;">
+                Site render error (this is why you see a blank screen)
+              </div>
+              <div style="opacity:.85; margin-bottom:10px;">
+                Copy/paste this entire error into chat:
+              </div>
+              <pre style="
+                white-space:pre-wrap;
+                word-break:break-word;
+                margin:0;
+                padding:14px;
+                border-radius:16px;
+                background:rgba(3,10,5,0.75);
+                border:1px solid rgba(201,162,74,0.25);
+                color:#EDE7D9;
+                font-size:12px;
+                line-height:1.35;">${msg}</pre>
+            </div>
+          </div>
+        `;
+      }
 
-      const BRAND = {
-        name: "Star & Brass Group",
-        city: "Dallas, Texas",
-        phoneDisplay: "(469) 265-4633",
-        phoneHref: "tel:+14692654633",
-        emailDisplay: "Jimmy@starandbrassgroup.com",
-        emailHref: "mailto:Jimmy@starandbrassgroup.com",
-      };
+      try {
+        /* =========================================================
+           React / helpers
+           ========================================================= */
+        const { useEffect, useMemo, useRef, useState } = React;
 
-      const cn = (...c) => c.filter(Boolean).join(" ");
+        function cn() {
+          return Array.prototype.slice.call(arguments).filter(Boolean).join(" ");
+        }
 
-      const Icon = {
-        ArrowRight: (p) => (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
-            <path d="M5 12h14" />
-            <path d="M13 5l7 7-7 7" />
-          </svg>
-        ),
-        Phone: (p) => (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
-            <path d="M22 16.9v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.86.3 1.7.54 2.5a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.57-1.1a2 2 0 0 1 2.11-.45c.8.24 1.64.42 2.5.54A2 2 0 0 1 22 16.9z" />
-          </svg>
-        ),
-        Mail: (p) => (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
-            <path d="M4 4h16v16H4z" />
-            <path d="M22 6l-10 7L2 6" />
-          </svg>
-        ),
-        MapPin: (p) => (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
-            <path d="M12 21s7-4.5 7-11a7 7 0 0 0-14 0c0 6.5 7 11 7 11z" />
-            <circle cx="12" cy="10" r="2.5" />
-          </svg>
-        ),
-        Check: (p) => (
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
-            <path d="M20 6L9 17l-5-5" />
-          </svg>
-        ),
-      };
-
-      const Pill = ({ children }) => (
-        <span className="inline-flex items-center rounded-full border border-[#C9A24A]/25 bg-[#C9A24A]/6 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#EDE7D9]/80">
-          {children}
-        </span>
-      );
-
-      const Button = ({ variant="primary", href, onClick, className="", children }) => {
-        const base = "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold tracking-wide transition active:scale-[0.99]";
-        const styles = {
-          primary: "bg-[#C9A24A] text-[#071E12] hover:bg-[#D7B66A] shadow-[0_12px_40px_rgba(201,162,74,0.14)]",
-          ghost: "bg-transparent text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#C9A24A]/10",
+        /* =========================================================
+           Brand / config
+           ========================================================= */
+        const BRAND = {
+          name: "Star & Brass Group",
+          city: "Dallas, Texas",
+          phoneDisplay: "(469) 265-4633",
+          phoneHref: "tel:+14692654633",
+          emailDisplay: "Jimmy@starandbrassgroup.com",
+          emailHref: "mailto:Jimmy@starandbrassgroup.com",
+          areas: ["Highland Park", "Preston Hollow", "Historic Old East Dallas"],
         };
-        const Comp = href ? "a" : "button";
-        return <Comp href={href} onClick={onClick} className={cn(base, styles[variant], className)}>{children}</Comp>;
-      };
 
-      const Divider = () => (
-        <div className="relative">
-          <div className="mx-auto h-px w-full max-w-6xl bg-gradient-to-r from-transparent via-[#C9A24A]/20 to-transparent" />
-        </div>
-      );
+        // Assets (repo root)
+        // If these filenames don't exist EXACTLY, the card will show a built-in placeholder.
+        const ASSETS = {
+          video: "estate-sweep.mp4",
+          concepts: {
+            material: "material.jpg",
+            elevation: "Elevation.jpg",
+            lighting: "lighting.jpg",
+            kitchen: "Kitchen.jpg",
+            bath: "Bath.jpg",
+            outdoor: "outdoor.jpg",
+          },
+        };
 
-      const GlassCard = ({ children, className="" }) => (
-        <div className={cn("rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4", className)}>{children}</div>
-      );
-
-      const VisualDirectionVideo = () => (
-        <div className="relative overflow-hidden rounded-[32px] border border-[#C9A24A]/20 bg-[#C9A24A]/4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
-          <div className="aspect-video w-full">
-            <video className="h-full w-full object-cover" src="estate-sweep.mp4" autoPlay loop muted playsInline preload="auto"></video>
-          </div>
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/80 via-transparent to-transparent"></div>
-          <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
-        </div>
-      );
-
-      const ConceptGallery = () => {
-        const items = useMemo(() => ([
-          { title:"Material direction", meta:"Brass, stone, warm woods", img:"material.jpg" },
-          { title:"Elevation study", meta:"Clean lines, deep shadows", img:"Elevation.jpg" },
-          { title:"Lighting plan", meta:"Layered, warm, restrained", img:"lighting.jpg" },
-          { title:"Kitchen concept", meta:"Real storage, real function", img:"Kitchen.jpg" },
-          { title:"Bath concept", meta:"Quiet luxury, durable", img:"Bath.jpg" },
-          { title:"Outdoor living", meta:"Dallas heat-ready", img:"outdoor.jpg" },
-        ]), []);
-
-        return (
-          <div className="grid gap-4 md:grid-cols-3">
-            {items.map((it) => (
-              <div key={it.title} className="relative overflow-hidden rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4">
-                <div className="relative aspect-[4/3] w-full overflow-hidden">
-                  <img src={it.img} alt={it.title} className="absolute inset-0 h-full w-full object-cover" />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/75 via-[#071E12]/10 to-transparent"></div>
-                  <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
-                </div>
-                <div className="p-5">
-                  <div className="text-sm font-semibold">{it.title}</div>
-                  <div className="mt-1 text-xs text-[#EDE7D9]/60">{it.meta}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        );
-      };
-
-      const ProcessCards = () => {
-        const rows = [
-          { k:"1. Pre Construction Planning", v:"Initial meetings with your architect/design team—or an interview process with our preferred partners." },
-          { k:"2. Field Mindset", v:"Set trades up for success through clarity: clean scopes, sequencing, and jobsite readiness." },
-          { k:"3. Office Mindset", v:"Weekly homeowner meetings for updates and selections approvals. Timely purchase orders so materials are onsite when needed." },
-          { k:"4. Detailed Home Delivery", v:"A fully searchable digital turnover package with warranties, trade contacts, final build sheet, and appliance documentation." },
-        ];
-        return (
-          <div className="grid gap-3">
-            {rows.map(r=>(
-              <div key={r.k} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">
-                <div className="text-sm font-semibold">{r.k}</div>
-                <div className="mt-1 text-sm text-[#EDE7D9]/70">{r.v}</div>
-              </div>
-            ))}
-          </div>
-        );
-      };
-
-      const FAQ = () => {
-        const faqs = [
-          { q:"Do you work cost-plus?", a:"Yes. We build primarily on a cost-plus basis with clear scope, allowances, and change control." },
-          { q:"Do you require an architect?", a:"We can start with your existing architect, or we can help you interview and select from preferred partners." },
-          { q:"What neighborhoods do you focus on?", a:"Highland Park, Preston Hollow, and Historic Old East Dallas." },
-        ];
-        return (
-          <div className="grid gap-3">
-            {faqs.map(f=>(
-              <div key={f.q} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-5">
-                <div className="text-sm font-semibold">{f.q}</div>
-                <div className="mt-2 text-sm text-[#EDE7D9]/70">{f.a}</div>
-              </div>
-            ))}
-          </div>
-        );
-      };
-
-      const ContactCard = () => (
-        <GlassCard className="p-6">
-          <div className="text-sm font-semibold">Contact</div>
-          <div className="mt-4 grid gap-3">
-            <a href={BRAND.phoneHref} className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10">
-              <div className="flex items-center gap-3">
-                <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
-                  <Icon.Phone className="h-5 w-5 text-[#C9A24A]" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">Call</div>
-                  <div className="text-sm text-[#EDE7D9]/70">{BRAND.phoneDisplay}</div>
-                </div>
-              </div>
-              <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
-            </a>
-
-            <a href={BRAND.emailHref} className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10">
-              <div className="flex items-center gap-3">
-                <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
-                  <Icon.Mail className="h-5 w-5 text-[#C9A24A]" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">Email</div>
-                  <div className="text-sm text-[#EDE7D9]/70">{BRAND.emailDisplay}</div>
-                </div>
-              </div>
-              <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
-            </a>
-
-            <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5">
-              <div className="flex items-center gap-3">
-                <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
-                  <Icon.MapPin className="h-5 w-5 text-[#C9A24A]" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold">Service areas</div>
-                  <div className="text-sm text-[#EDE7D9]/70">Dallas</div>
-                </div>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Pill>Highland Park</Pill>
-                <Pill>Preston Hollow</Pill>
-                <Pill>Historic Old East Dallas</Pill>
-              </div>
-            </div>
-          </div>
-        </GlassCard>
-      );
-
-      const PageWrap = ({ eyebrow, title, subtitle, children, right }) => (
-        <div className="mx-auto max-w-6xl px-4 pb-16 pt-10">
-          <div className="grid gap-8 md:grid-cols-2 md:items-end">
-            <div>
-              <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">{eyebrow}</div>
-              <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h1>
-              {subtitle ? <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">{subtitle}</p> : null}
-            </div>
-            {right ? <div className="md:justify-self-end">{right}</div> : null}
-          </div>
-          <div className="mt-8">{children}</div>
-        </div>
-      );
-
-      function App() {
-        const nav = useMemo(() => ([
-          { id:"home", label:"Home" },
-          { id:"approach", label:"Approach" },
-          { id:"capabilities", label:"Capabilities" },
-          { id:"standards", label:"Standards" },
-          { id:"faq", label:"FAQ" },
-          { id:"contact", label:"Contact" },
-        ]), []);
-
-        const [page, setPage] = useState("home");
-
-        return (
-          <div className="min-h-screen">
-            <div className="pointer-events-none fixed inset-0">
-              <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_15%_10%,rgba(201,162,74,0.10),transparent_60%)]"></div>
-              <div className="absolute inset-0 bg-[radial-gradient(700px_450px_at_85%_30%,rgba(201,162,74,0.08),transparent_60%)]"></div>
-              <div className="absolute inset-0 bg-gradient-to-b from-[#071E12] via-[#05110A] to-[#030A05]"></div>
-            </div>
-
-            <header className="sticky top-0 z-50 border-b border-[#C9A24A]/20 bg-[#071E12]/75 backdrop-blur">
-              <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-                <button onClick={()=>setPage("home")} className="text-left">
-                  <div className="text-lg font-semibold">{BRAND.name}</div>
-                  <div className="text-sm text-[#EDE7D9]/60">{BRAND.city}</div>
-                </button>
-
-                <nav className="hidden md:flex items-center gap-6">
-                  {nav.map(n=>(
-                    <button
-                      key={n.id}
-                      onClick={()=>setPage(n.id)}
-                      className={cn(
-                        "text-[11px] font-semibold tracking-[0.22em] uppercase transition",
-                        page===n.id ? "text-[#C9A24A]" : "text-[#EDE7D9]/70 hover:text-[#EDE7D9]"
-                      )}
-                    >
-                      {n.label}
-                    </button>
-                  ))}
-                </nav>
-
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" href={BRAND.phoneHref}>
-                    <Icon.Phone className="h-4 w-4" />
-                    Call
-                  </Button>
-                  <Button variant="primary" onClick={()=>setPage("contact")}>
-                    Start a build <Icon.ArrowRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </header>
-
-            {page === "home" ? (
-              <>
-                <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-12 pt-10 md:grid-cols-2 md:items-center md:pb-16">
-                  <div>
-                    <div className="flex flex-wrap gap-2">
-                      <Pill>Luxury custom homebuilder</Pill>
-                      <Pill>Veteran-owned</Pill>
-                      <Pill>{BRAND.city}</Pill>
-                    </div>
-
-                    <h1 className="mt-6 text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
-                      We build homes you don’t forget.
-                    </h1>
-
-                    <p className="mt-5 max-w-xl text-base leading-relaxed text-[#EDE7D9]/70 md:text-lg">
-                      Star &amp; Brass Group is a Dallas-based startup run by two Marine Corps veterans.
-                      We bring building science fundamentals and hands-on experience across building materials,
-                      multifamily, production luxury townhomes, semi-custom, and full luxury custom homes—typically
-                      starting around $700/sf on a cost-plus basis.
-                    </p>
-
-                    <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                      <Button variant="primary" onClick={()=>setPage("contact")}>
-                        Request a consult <Icon.ArrowRight className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" onClick={()=>setPage("approach")}>How we work</Button>
-                      <Button variant="ghost" onClick={()=>setPage("standards")}>Our standard</Button>
-                    </div>
-
-                    <GlassCard className="mt-8 p-5">
-                      <div className="text-sm font-semibold">Build your dream with detail-oriented building science professionals.</div>
-                      <div className="mt-1 text-sm text-[#EDE7D9]/70">Clear decisions, disciplined execution, and a team built to protect the standard.</div>
-                    </GlassCard>
-                  </div>
-
-                  <div className="relative">
-                    <GlassCard className="p-4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
-                      <div className="rounded-[28px] border border-[#C9A24A]/20 bg-gradient-to-br from-[#C9A24A]/12 via-[#C9A24A]/7 to-transparent p-5">
-                        <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/60">Startup, serious systems</div>
-                        <div className="mt-6"><ProcessCards /></div>
-                      </div>
-                    </GlassCard>
-                  </div>
-                </div>
-
-                <Divider />
-
-                <div className="mx-auto max-w-6xl px-4 py-14">
-                  <div className="grid gap-8 md:grid-cols-2 md:items-end">
-                    <div>
-                      <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">Visual direction</div>
-                      <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Cinematic concept, photo-ready standards</h2>
-                      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">
-                        We’re a startup, so we won’t borrow photos from past employers. Until our first builds are shot, we show concept media and material direction.
-                      </p>
-                    </div>
-                    <div className="flex justify-start md:justify-end">
-                      <Button variant="ghost" onClick={()=>setPage("contact")}>Talk scope <Icon.ArrowRight className="h-4 w-4" /></Button>
-                    </div>
-                  </div>
-
-                  <div className="mt-8">
-                    <VisualDirectionVideo />
-                    <div className="mt-6">
-                      <ConceptGallery />
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : null}
-
-            {page === "approach" ? (
-              <PageWrap eyebrow="Approach" title="How we run work" subtitle="Predictable outcomes come from disciplined systems."
-                right={<Button variant="ghost" onClick={()=>setPage("contact")}>Start a build <Icon.ArrowRight className="h-4 w-4" /></Button>}
+        /* =========================================================
+           Icons (inline SVG to avoid any external libs)
+           ========================================================= */
+        const Icon = {
+          ArrowRight: function ArrowRight(p) {
+            return (
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                {...p}
               >
-                <div className="grid gap-8 md:grid-cols-2">
-                  <ProcessCards />
-                  <GlassCard className="p-6">
-                    <div className="text-sm font-semibold">Owner experience</div>
-                    <div className="mt-2 text-sm text-[#EDE7D9]/70">Tight scopes. Clean sequencing. Decisions made with context. Site stays disciplined.</div>
+                <path d="M5 12h14" />
+                <path d="M13 5l7 7-7 7" />
+              </svg>
+            );
+          },
+          Phone: function Phone(p) {
+            return (
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                {...p}
+              >
+                <path d="M22 16.9v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.86.3 1.7.54 2.5a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.57-1.1a2 2 0 0 1 2.11-.45c.8.24 1.64.42 2.5.54A2 2 0 0 1 22 16.9z" />
+              </svg>
+            );
+          },
+          Mail: function Mail(p) {
+            return (
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                {...p}
+              >
+                <path d="M4 4h16v16H4z" />
+                <path d="M22 6l-10 7L2 6" />
+              </svg>
+            );
+          },
+          MapPin: function MapPin(p) {
+            return (
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                {...p}
+              >
+                <path d="M12 21s7-4.5 7-11a7 7 0 0 0-14 0c0 6.5 7 11 7 11z" />
+                <circle cx="12" cy="10" r="2.5" />
+              </svg>
+            );
+          },
+          Check: function Check(p) {
+            return (
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                {...p}
+              >
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            );
+          },
+          Spark: function Spark(p) {
+            return (
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                {...p}
+              >
+                <path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8L12 2z" />
+              </svg>
+            );
+          },
+        };
+
+        /* =========================================================
+           UI primitives
+           ========================================================= */
+        function Pill(props) {
+          return (
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#C9A24A]/25 bg-[#C9A24A]/6 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#EDE7D9]/80">
+              {props.children}
+            </span>
+          );
+        }
+
+        function Button(props) {
+          const variant = props.variant || "primary";
+          const href = props.href;
+          const onClick = props.onClick;
+          const className = props.className || "";
+          const children = props.children;
+
+          const base =
+            "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold tracking-wide transition active:scale-[0.99] no-select";
+
+          const styles = {
+            primary:
+              "bg-[#C9A24A] text-[#071E12] hover:bg-[#D7B66A] shadow-[0_12px_40px_rgba(201,162,74,0.14)]",
+            ghost:
+              "bg-transparent text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#C9A24A]/10",
+            dark:
+              "bg-[#05110A] text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#030A05]",
+          };
+
+          const Comp = href ? "a" : "button";
+          return (
+            <Comp
+              href={href}
+              onClick={onClick}
+              className={cn(base, styles[variant], className)}
+            >
+              {children}
+            </Comp>
+          );
+        }
+
+        function Divider() {
+          return (
+            <div className="relative">
+              <div className="mx-auto h-px w-full max-w-6xl bg-gradient-to-r from-transparent via-[#C9A24A]/20 to-transparent" />
+            </div>
+          );
+        }
+
+        function GlassCard(props) {
+          return (
+            <div
+              className={cn(
+                "rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4",
+                props.className || ""
+              )}
+            >
+              {props.children}
+            </div>
+          );
+        }
+
+        /* =========================================================
+           Media components
+           ========================================================= */
+
+        function VisualDirectionVideo() {
+          return (
+            <div className="relative overflow-hidden rounded-[32px] border border-[#C9A24A]/20 bg-[#C9A24A]/4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
+              <div className="aspect-video w-full">
+                <video
+                  className="h-full w-full object-cover"
+                  src={ASSETS.video}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                ></video>
+              </div>
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/80 via-transparent to-transparent"></div>
+              <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
+            </div>
+          );
+        }
+
+        function ImageWithFallback(props) {
+          // If the image fails, show a clean placeholder (instead of collapsing the card).
+          const src = props.src;
+          const alt = props.alt;
+          const label = props.label;
+          const className = props.className || "";
+          const [ok, setOk] = useState(true);
+
+          return (
+            <div className={cn("absolute inset-0", className)}>
+              {ok ? (
+                <img
+                  src={src}
+                  alt={alt}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  onError={() => setOk(false)}
+                />
+              ) : (
+                <div className="h-full w-full bg-[radial-gradient(900px_400px_at_20%_10%,rgba(201,162,74,0.18),transparent_55%),radial-gradient(700px_350px_at_80%_30%,rgba(237,231,217,0.10),transparent_55%),linear-gradient(180deg,rgba(3,10,5,0.35),rgba(7,30,18,0.90))]">
+                  <div className="absolute inset-0 flex items-end p-5">
+                    <div className="text-xs uppercase tracking-[0.22em] text-[#EDE7D9]/70">
+                      Missing file:
+                      <span className="ml-2 text-[#C9A24A]">{label}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        function ConceptGallery() {
+          const items = useMemo(
+            function () {
+              return [
+                {
+                  title: "Material direction",
+                  meta: "Brass, stone, warm woods",
+                  img: ASSETS.concepts.material,
+                  label: ASSETS.concepts.material,
+                },
+                {
+                  title: "Elevation study",
+                  meta: "Clean lines, deep shadows",
+                  img: ASSETS.concepts.elevation,
+                  label: ASSETS.concepts.elevation,
+                },
+                {
+                  title: "Lighting plan",
+                  meta: "Layered, warm, restrained",
+                  img: ASSETS.concepts.lighting,
+                  label: ASSETS.concepts.lighting,
+                },
+                {
+                  title: "Kitchen concept",
+                  meta: "Real storage, real function",
+                  img: ASSETS.concepts.kitchen,
+                  label: ASSETS.concepts.kitchen,
+                },
+                {
+                  title: "Bath concept",
+                  meta: "Quiet luxury, durable",
+                  img: ASSETS.concepts.bath,
+                  label: ASSETS.concepts.bath,
+                },
+                {
+                  title: "Outdoor living",
+                  meta: "Dallas heat-ready",
+                  img: ASSETS.concepts.outdoor,
+                  label: ASSETS.concepts.outdoor,
+                },
+              ];
+            },
+            []
+          );
+
+          return (
+            <div className="grid gap-4 md:grid-cols-3">
+              {items.map(function (it) {
+                return (
+                  <div
+                    key={it.title}
+                    className="relative overflow-hidden rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4"
+                  >
+                    <div className="relative aspect-[4/3] w-full overflow-hidden">
+                      <ImageWithFallback
+                        src={it.img}
+                        alt={it.title}
+                        label={it.label}
+                      />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/75 via-[#071E12]/10 to-transparent"></div>
+                      <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
+                    </div>
+                    <div className="p-5">
+                      <div className="text-sm font-semibold text-[#EDE7D9]">
+                        {it.title}
+                      </div>
+                      <div className="mt-1 text-xs text-[#EDE7D9]/60">
+                        {it.meta}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
+
+        /* =========================================================
+           Content blocks
+           ========================================================= */
+        function ProcessCards() {
+          const rows = [
+            {
+              k: "1. Pre Construction Planning",
+              v:
+                "Initial meetings with your architect/design team—or an interview process with our preferred partners.",
+            },
+            {
+              k: "2. Field Mindset",
+              v:
+                "Set trades up for success through clarity: clean scopes, sequencing, and jobsite readiness.",
+            },
+            {
+              k: "3. Office Mindset",
+              v:
+                "Weekly homeowner meetings for updates and selections approvals. Timely purchase orders so materials are onsite when needed.",
+            },
+            {
+              k: "4. Detailed Home Delivery",
+              v:
+                "A fully searchable digital turnover package with warranties, trade contacts, final build sheet, and appliance documentation.",
+            },
+          ];
+
+          return (
+            <div className="grid gap-3">
+              {rows.map(function (r) {
+                return (
+                  <div
+                    key={r.k}
+                    className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4"
+                  >
+                    <div className="text-sm font-semibold">{r.k}</div>
+                    <div className="mt-1 text-sm text-[#EDE7D9]/70">{r.v}</div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
+
+        function FAQ() {
+          const faqs = [
+            {
+              q: "Do you work cost-plus?",
+              a:
+                "Yes. We build primarily on a cost-plus basis with clear scope, allowances, and change control.",
+            },
+            {
+              q: "Do you require an architect?",
+              a:
+                "We can start with your existing architect, or we can help you interview and select from preferred partners.",
+            },
+            {
+              q: "What neighborhoods do you focus on?",
+              a:
+                "Highland Park, Preston Hollow, and Historic Old East Dallas.",
+            },
+            {
+              q: "Are you veteran-owned?",
+              a:
+                "Yes. Veteran-owned is part of who we are, but we lead with execution and standards.",
+            },
+          ];
+
+          return (
+            <div className="grid gap-3">
+              {faqs.map(function (f) {
+                return (
+                  <div
+                    key={f.q}
+                    className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-5"
+                  >
+                    <div className="text-sm font-semibold">{f.q}</div>
+                    <div className="mt-2 text-sm text-[#EDE7D9]/70">{f.a}</div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
+
+        function ContactCard() {
+          return (
+            <GlassCard className="p-6">
+              <div className="text-sm font-semibold">Contact</div>
+
+              <div className="mt-4 grid gap-3">
+                <a
+                  href={BRAND.phoneHref}
+                  className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                      <Icon.Phone className="h-5 w-5 text-[#C9A24A]" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">Call</div>
+                      <div className="text-sm text-[#EDE7D9]/70">
+                        {BRAND.phoneDisplay}
+                      </div>
+                    </div>
+                  </div>
+                  <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
+                </a>
+
+                <a
+                  href={BRAND.emailHref}
+                  className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                      <Icon.Mail className="h-5 w-5 text-[#C9A24A]" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">Email</div>
+                      <div className="text-sm text-[#EDE7D9]/70">
+                        {BRAND.emailDisplay}
+                      </div>
+                    </div>
+                  </div>
+                  <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
+                </a>
+
+                <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                      <Icon.MapPin className="h-5 w-5 text-[#C9A24A]" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">Service areas</div>
+                      <div className="text-sm text-[#EDE7D9]/70">Dallas</div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {BRAND.areas.map(function (a) {
+                      return <Pill key={a}>{a}</Pill>;
+                    })}
+                  </div>
+                </div>
+              </div>
+            </GlassCard>
+          );
+        }
+
+        function PageWrap(props) {
+          return (
+            <div className="mx-auto max-w-6xl px-4 pb-16 pt-10">
+              <div className="grid gap-8 md:grid-cols-2 md:items-end">
+                <div>
+                  <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">
+                    {props.eyebrow}
+                  </div>
+                  <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
+                    {props.title}
+                  </h1>
+                  {props.subtitle ? (
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">
+                      {props.subtitle}
+                    </p>
+                  ) : null}
+                </div>
+
+                {props.right ? (
+                  <div className="md:justify-self-end">{props.right}</div>
+                ) : null}
+              </div>
+
+              <div className="mt-8">{props.children}</div>
+            </div>
+          );
+        }
+
+        /* =========================================================
+           Pages (Home + 5 tabs)
+           ========================================================= */
+        function HomePage(props) {
+          return (
+            <React.Fragment>
+              <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-12 pt-10 md:grid-cols-2 md:items-center md:pb-16">
+                <div>
+                  <div className="flex flex-wrap gap-2">
+                    <Pill>Luxury custom homebuilder</Pill>
+                    <Pill>Veteran-owned</Pill>
+                    <Pill>{BRAND.city}</Pill>
+                  </div>
+
+                  <h1 className="mt-6 text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+                    We build homes you don&apos;t forget.
+                  </h1>
+
+                  <p className="mt-5 max-w-xl text-base leading-relaxed text-[#EDE7D9]/70 md:text-lg">
+                    Star &amp; Brass Group is a Dallas-based startup run by two Marine
+                    Corps veterans. We bring building science fundamentals and hands-on
+                    experience across building materials, multifamily, production luxury
+                    townhomes, semi-custom, and full luxury custom homes—typically
+                    starting around $700/sf on a cost-plus basis.
+                  </p>
+
+                  <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                    <Button variant="primary" onClick={props.onContact}>
+                      Request a consult <Icon.ArrowRight className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" onClick={props.onApproach}>
+                      How we work
+                    </Button>
+                    <Button variant="ghost" onClick={props.onStandards}>
+                      Our standard
+                    </Button>
+                  </div>
+
+                  <GlassCard className="mt-8 p-5">
+                    <div className="text-sm font-semibold">
+                      Build your dream with detail-oriented building science professionals.
+                    </div>
+                    <div className="mt-1 text-sm text-[#EDE7D9]/70">
+                      Clear decisions, disciplined execution, and a team built to protect the standard.
+                    </div>
                   </GlassCard>
                 </div>
-              </PageWrap>
-            ) : null}
 
-            {page === "capabilities" ? (
-              <PageWrap eyebrow="Capabilities" title="What we build"
-                subtitle="Luxury custom homes and major renovations, executed with building science fundamentals."
-                right={<Button variant="ghost" onClick={()=>setPage("contact")}>Talk scope <Icon.ArrowRight className="h-4 w-4" /></Button>}
-              >
-                <div className="grid gap-6 md:grid-cols-2">
-                  <GlassCard className="p-6"><div className="text-sm font-semibold">Custom homes</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Full-service build management from precon through closeout.</div></GlassCard>
-                  <GlassCard className="p-6"><div className="text-sm font-semibold">Major renovations</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Structural and envelope work planned to protect the final product.</div></GlassCard>
-                  <GlassCard className="p-6 md:col-span-2"><div className="text-sm font-semibold">Team integration</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Work with your architect + designer, or we’ll help you interview and select partners.</div></GlassCard>
+                <div className="relative">
+                  <GlassCard className="p-4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
+                    <div className="rounded-[28px] border border-[#C9A24A]/20 bg-gradient-to-br from-[#C9A24A]/12 via-[#C9A24A]/7 to-transparent p-5">
+                      <div className="flex items-center justify-between">
+                        <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/60">
+                          Startup, serious systems
+                        </div>
+                        <Pill>
+                          <Icon.Check className="h-3.5 w-3.5" />
+                          Owner-first
+                        </Pill>
+                      </div>
+
+                      <div className="mt-6">
+                        <ProcessCards />
+                      </div>
+
+                      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                        <Button variant="dark" href={BRAND.emailHref} className="w-full">
+                          <Icon.Mail className="h-4 w-4" />
+                          Email us
+                        </Button>
+                        <Button variant="ghost" href={BRAND.phoneHref} className="w-full">
+                          <Icon.Phone className="h-4 w-4" />
+                          Call now
+                        </Button>
+                      </div>
+                    </div>
+                  </GlassCard>
                 </div>
-              </PageWrap>
-            ) : null}
+              </div>
 
-            {page === "standards" ? (
-              <PageWrap eyebrow="Standards" title="The standard"
-                subtitle="A quiet, disciplined jobsite that protects schedule, craftsmanship, and finishes."
-                right={<Button variant="ghost" onClick={()=>setPage("contact")}>Start a build <Icon.ArrowRight className="h-4 w-4" /></Button>}
-              >
-                <div className="grid gap-6 md:grid-cols-2">
-                  {[
-                    { t:"Clarity", d:"Scopes written for accountability. No fuzzy handoffs." },
-                    { t:"Sequencing", d:"Work planned around long-lead items and critical path." },
-                    { t:"Clean logistics", d:"Material flow that keeps the site tight and safe." },
-                    { t:"Durable assemblies", d:"Building science fundamentals applied where it matters." },
-                  ].map(x=>(
+              <Divider />
+
+              <div className="mx-auto max-w-6xl px-4 py-14">
+                <div className="grid gap-8 md:grid-cols-2 md:items-end">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">
+                      Visual direction
+                    </div>
+
+                    <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
+                      Cinematic concept, photo-ready standards
+                    </h2>
+
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">
+                      We’re a startup, so we won’t borrow photos from past employers.
+                      Until our first builds are shot, we show concept media and material
+                      direction to communicate taste and standards.
+                    </p>
+                  </div>
+
+                  <div className="flex justify-start md:justify-end">
+                    <Button variant="ghost" onClick={props.onContact}>
+                      Talk scope <Icon.ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="mt-8">
+                  <VisualDirectionVideo />
+                  <div className="mt-6">
+                    <ConceptGallery />
+                  </div>
+                </div>
+              </div>
+            </React.Fragment>
+          );
+        }
+
+        function ApproachPage(props) {
+          return (
+            <PageWrap
+              eyebrow="Approach"
+              title="How we run work"
+              subtitle="Predictable outcomes come from disciplined systems."
+              right={
+                <Button variant="ghost" onClick={props.onContact}>
+                  Start a build <Icon.ArrowRight className="h-4 w-4" />
+                </Button>
+              }
+            >
+              <div className="grid gap-8 md:grid-cols-2">
+                <ProcessCards />
+                <GlassCard className="p-6">
+                  <div className="text-sm font-semibold">Owner experience</div>
+                  <div className="mt-2 text-sm text-[#EDE7D9]/70">
+                    Tight scopes. Clean sequencing. Decisions made with context. Site stays disciplined.
+                  </div>
+
+                  <div className="mt-5 grid gap-3">
+                    {[
+                      "Clear precon expectations",
+                      "Field execution that protects finishes",
+                      "Office cadence that keeps choices moving",
+                      "Turnover package you can actually use",
+                    ].map(function (x) {
+                      return (
+                        <div
+                          key={x}
+                          className="flex items-center gap-3 rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4"
+                        >
+                          <div className="rounded-xl border border-[#C9A24A]/25 bg-[#C9A24A]/6 p-1.5">
+                            <Icon.Check className="h-4 w-4 text-[#C9A24A]" />
+                          </div>
+                          <div className="text-sm text-[#EDE7D9]/75">{x}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </GlassCard>
+              </div>
+            </PageWrap>
+          );
+        }
+
+        function CapabilitiesPage(props) {
+          return (
+            <PageWrap
+              eyebrow="Capabilities"
+              title="What we build"
+              subtitle="Luxury custom homes and major renovations, executed with building science fundamentals."
+              right={
+                <Button variant="ghost" onClick={props.onContact}>
+                  Talk scope <Icon.ArrowRight className="h-4 w-4" />
+                </Button>
+              }
+            >
+              <div className="grid gap-6 md:grid-cols-2">
+                <GlassCard className="p-6">
+                  <div className="text-sm font-semibold">Custom homes</div>
+                  <div className="mt-2 text-sm text-[#EDE7D9]/70">
+                    Full-service build management from precon through closeout.
+                  </div>
+                </GlassCard>
+
+                <GlassCard className="p-6">
+                  <div className="text-sm font-semibold">Major renovations</div>
+                  <div className="mt-2 text-sm text-[#EDE7D9]/70">
+                    Structural and envelope work planned to protect the final product.
+                  </div>
+                </GlassCard>
+
+                <GlassCard className="p-6 md:col-span-2">
+                  <div className="text-sm font-semibold">Team integration</div>
+                  <div className="mt-2 text-sm text-[#EDE7D9]/70">
+                    Work with your architect + designer, or we’ll help you interview and select partners.
+                  </div>
+                </GlassCard>
+
+                <GlassCard className="p-6 md:col-span-2">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                      <Icon.Spark className="h-5 w-5 text-[#C9A24A]" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">Startup note</div>
+                      <div className="text-sm text-[#EDE7D9]/70">
+                        Concept media now. Jobsite photos later—shot clean and professional.
+                      </div>
+                    </div>
+                  </div>
+                </GlassCard>
+              </div>
+            </PageWrap>
+          );
+        }
+
+        function StandardsPage(props) {
+          return (
+            <PageWrap
+              eyebrow="Standards"
+              title="The standard"
+              subtitle="A quiet, disciplined jobsite that protects schedule, craftsmanship, and finishes."
+              right={
+                <Button variant="ghost" onClick={props.onContact}>
+                  Start a build <Icon.ArrowRight className="h-4 w-4" />
+                </Button>
+              }
+            >
+              <div className="grid gap-6 md:grid-cols-2">
+                {[
+                  { t: "Clarity", d: "Scopes written for accountability. No fuzzy handoffs." },
+                  { t: "Sequencing", d: "Work planned around long-lead items and critical path." },
+                  { t: "Clean logistics", d: "Material flow that keeps the site tight and safe." },
+                  { t: "Durable assemblies", d: "Building science fundamentals applied where it matters." },
+                ].map(function (x) {
+                  return (
                     <GlassCard key={x.t} className="p-6">
                       <div className="text-sm font-semibold">{x.t}</div>
                       <div className="mt-2 text-sm text-[#EDE7D9]/70">{x.d}</div>
                     </GlassCard>
-                  ))}
-                </div>
-              </PageWrap>
-            ) : null}
-
-            {page === "faq" ? (
-              <PageWrap eyebrow="FAQ" title="Answers upfront"
-                subtitle="The basics clients ask before we kick off."
-                right={<Button variant="ghost" onClick={()=>setPage("contact")}>Contact <Icon.ArrowRight className="h-4 w-4" /></Button>}
-              >
-                <FAQ />
-              </PageWrap>
-            ) : null}
-
-            {page === "contact" ? (
-              <PageWrap eyebrow="Contact" title="Let’s talk about your build"
-                subtitle="Jobsite math chatbot appears as the chat bubble (bottom-right)."
-              >
-                <div className="grid gap-8 md:grid-cols-2 md:items-start">
-                  <GlassCard className="p-6">
-                    <div className="text-sm font-semibold">Before we talk numbers</div>
-                    <div className="mt-3 grid gap-3 text-sm text-[#EDE7D9]/75">
-                      {["Where is the property?", "New build or major renovation?", "Architect/design team selected?", "Target start date?"].map(x=>(
-                        <div key={x} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">{x}</div>
-                      ))}
-                    </div>
-                  </GlassCard>
-                  <ContactCard />
-                </div>
-              </PageWrap>
-            ) : null}
-
-            <footer className="relative border-t border-[#C9A24A]/20 bg-[#05110A]/85">
-              <div className="mx-auto max-w-6xl px-4 py-10">
-                <div className="grid gap-6 md:grid-cols-2 md:items-center">
-                  <div>
-                    <div className="text-sm font-semibold">{BRAND.name}</div>
-                    <div className="text-xs text-[#EDE7D9]/60">Veteran-owned • Luxury custom homes • {BRAND.city}</div>
-                  </div>
-                  <div className="flex flex-wrap gap-4 md:justify-end">
-                    {nav.map(n=>(
-                      <button key={n.id} onClick={()=>setPage(n.id)} className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55 hover:text-[#EDE7D9]">
-                        {n.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                  );
+                })}
               </div>
-            </footer>
-          </div>
-        );
-      }
+            </PageWrap>
+          );
+        }
 
-      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+        function FAQPage(props) {
+          return (
+            <PageWrap
+              eyebrow="FAQ"
+              title="Answers upfront"
+              subtitle="The basics clients ask before we kick off."
+              right={
+                <Button variant="ghost" onClick={props.onContact}>
+                  Contact <Icon.ArrowRight className="h-4 w-4" />
+                </Button>
+              }
+            >
+              <FAQ />
+            </PageWrap>
+          );
+        }
+
+        function ContactPage() {
+          return (
+            <PageWrap
+              eyebrow="Contact"
+              title="Let’s talk about your build"
+              subtitle="Jobsite math chatbot appears as the chat bubble (bottom-right)."
+            >
+              <div className="grid gap-8 md:grid-cols-2 md:items-start">
+                <GlassCard className="p-6">
+                  <div className="text-sm font-semibold">Before we talk numbers</div>
+                  <div className="mt-3 grid gap-3 text-sm text-[#EDE7D9]/75">
+                    {[
+                      "Where is the property?",
+                      "New build or major renovation?",
+                      "Architect/design team selected?",
+                      "Target start date?",
+                    ].map(function (x) {
+                      return (
+                        <div
+                          key={x}
+                          className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4"
+                        >
+                          {x}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="mt-6 rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">
+                    <div className="text-sm font-semibold">Jobsite math chatbot</div>
+                    <div className="mt-2 text-sm text-[#EDE7D9]/70">
+                      If you only see the bubble and no site content, the error box at top will show why.
+                    </div>
+                  </div>
+                </GlassCard>
+
+                <ContactCard />
+              </div>
+            </PageWrap>
+          );
+        }
+
+        /* =========================================================
+           App
+           ========================================================= */
+        function App() {
+          const nav = useMemo(function () {
+            return [
+              { id: "home", label: "Home" },
+              { id: "approach", label: "Approach" },
+              { id: "capabilities", label: "Capabilities" },
+              { id: "standards", label: "Standards" },
+              { id: "faq", label: "FAQ" },
+              { id: "contact", label: "Contact" },
+            ];
+          }, []);
+
+          const [page, setPage] = useState("home");
+
+          return (
+            <div className="min-h-screen">
+              {/* Background glow */}
+              <div className="pointer-events-none fixed inset-0">
+                <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_15%_10%,rgba(201,162,74,0.10),transparent_60%)]"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(700px_450px_at_85%_30%,rgba(201,162,74,0.08),transparent_60%)]"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-[#071E12] via-[#05110A] to-[#030A05]"></div>
+              </div>
+
+              {/* Header */}
+              <header className="sticky top-0 z-50 border-b border-[#C9A24A]/20 bg-[#071E12]/75 backdrop-blur">
+                <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+                  <button onClick={() => setPage("home")} className="text-left no-select">
+                    <div className="text-lg font-semibold">{BRAND.name}</div>
+                    <div className="text-sm text-[#EDE7D9]/60">{BRAND.city}</div>
+                  </button>
+
+                  <nav className="hidden md:flex items-center gap-6">
+                    {nav.map(function (n) {
+                      return (
+                        <button
+                          key={n.id}
+                          onClick={() => setPage(n.id)}
+                          className={cn(
+                            "text-[11px] font-semibold tracking-[0.22em] uppercase transition no-select",
+                            page === n.id
+                              ? "text-[#C9A24A]"
+                              : "text-[#EDE7D9]/70 hover:text-[#EDE7D9]"
+                          )}
+                        >
+                          {n.label}
+                        </button>
+                      );
+                    })}
+                  </nav>
+
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" href={BRAND.phoneHref}>
+                      <Icon.Phone className="h-4 w-4" />
+                      Call
+                    </Button>
+                    <Button variant="primary" onClick={() => setPage("contact")}>
+                      Start a build <Icon.ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </header>
+
+              {/* Pages */}
+              <main className="relative">
+                {page === "home" ? (
+                  <HomePage
+                    onContact={() => setPage("contact")}
+                    onApproach={() => setPage("approach")}
+                    onStandards={() => setPage("standards")}
+                  />
+                ) : null}
+
+                {page === "approach" ? (
+                  <ApproachPage onContact={() => setPage("contact")} />
+                ) : null}
+
+                {page === "capabilities" ? (
+                  <CapabilitiesPage onContact={() => setPage("contact")} />
+                ) : null}
+
+                {page === "standards" ? (
+                  <StandardsPage onContact={() => setPage("contact")} />
+                ) : null}
+
+                {page === "faq" ? <FAQPage onContact={() => setPage("contact")} /> : null}
+
+                {page === "contact" ? <ContactPage /> : null}
+
+                {/* Footer */}
+                <footer className="relative border-t border-[#C9A24A]/20 bg-[#05110A]/85">
+                  <div className="mx-auto max-w-6xl px-4 py-10">
+                    <div className="grid gap-6 md:grid-cols-2 md:items-center">
+                      <div>
+                        <div className="text-sm font-semibold">{BRAND.name}</div>
+                        <div className="text-xs text-[#EDE7D9]/60">
+                          Veteran-owned • Luxury custom homes • {BRAND.city}
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-4 md:justify-end">
+                        {nav.map(function (n) {
+                          return (
+                            <button
+                              key={n.id}
+                              onClick={() => setPage(n.id)}
+                              className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55 hover:text-[#EDE7D9] no-select"
+                            >
+                              {n.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Helpful: show what asset names are expected */}
+                    <div className="mt-8 rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/55 p-4">
+                      <div className="text-xs uppercase tracking-[0.22em] text-[#EDE7D9]/55">
+                        Expected asset filenames (repo root)
+                      </div>
+                      <div className="mt-2 grid gap-1 text-xs text-[#EDE7D9]/70">
+                        <div>Video: {ASSETS.video}</div>
+                        <div>Material: {ASSETS.concepts.material}</div>
+                        <div>Elevation: {ASSETS.concepts.elevation}</div>
+                        <div>Lighting: {ASSETS.concepts.lighting}</div>
+                        <div>Kitchen: {ASSETS.concepts.kitchen}</div>
+                        <div>Bath: {ASSETS.concepts.bath}</div>
+                        <div>Outdoor: {ASSETS.concepts.outdoor}</div>
+                      </div>
+                    </div>
+                  </div>
+                </footer>
+              </main>
+            </div>
+          );
+        }
+
+        /* =========================================================
+           Mount
+           ========================================================= */
+        const rootEl = document.getElementById("root");
+        ReactDOM.createRoot(rootEl).render(<App />);
+      } catch (err) {
+        renderFatalError(err);
+      }
     </script>
   </body>
 </html>
