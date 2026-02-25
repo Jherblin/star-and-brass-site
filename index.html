@@ -2,340 +2,633 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Star & Brass</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Star & Brass Group</title>
 
-    <!-- React + ReactDOM (UMD) -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-
-    <!-- Babel (so the browser can run JSX in the script below) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-      html, body { margin: 0; padding: 0; background: #0b0e0b; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-      .p-5 { padding: 20px; }
+      html, body { height: 100%; }
+      video { display:block; }
+
+      /* Always keep Chatling above everything */
+      #chtl-script, iframe, .chtl-widget, .chatling-widget { z-index: 999999 !important; }
+
+      .no-select { -webkit-user-select:none; user-select:none; }
+
+      ::-webkit-scrollbar { width:10px; }
+      ::-webkit-scrollbar-thumb { background: rgba(201,162,74,0.25); border-radius:999px; }
+      ::-webkit-scrollbar-track { background: rgba(7,30,18,0.6); }
+
+      /* Label above Chatling bubble */
+      .jobsite-label {
+        position: fixed;
+        right: 18px;
+        bottom: 92px; /* sits above the bubble */
+        z-index: 999998;
+        pointer-events: none;
+      }
     </style>
   </head>
 
-  <body>
+  <body class="bg-[#071E12] text-[#EDE7D9]">
     <div id="root"></div>
 
+    <!-- Chatling (YOUR embed) -->
+    <script>
+      window.chtlConfig = { chatbotId: "6976442446" };
+    </script>
+    <script async data-id="6976442446" id="chtl-script" type="text/javascript" src="https://chatling.ai/js/embed.js"></script>
+
     <script type="text/babel">
-      /* ============================
-         STAR & BRASS – SINGLE FILE APP
-         ============================ */
-
-      const BRAND = {
-        city: "Dallas, TX",
-        emailHref: "mailto:info@starandbrass.com",
-        phoneHref: "tel:+12145551234",
-      };
-
-      const LOT_SCOUT_URL =
-        "https://ais-pre-z2wsyvthr1nd3dddxitc64-181965608527.us-east1.run.app";
-
-      function Divider() {
-        return (
-          <div
-            style={{
-              height: 1,
-              width: "100%",
-              background:
-                "linear-gradient(90deg, rgba(237,231,217,0.05), rgba(237,231,217,0.25), rgba(237,231,217,0.05))",
-              margin: "24px 0",
-            }}
-          />
-        );
-      }
-
-      function GlassCard({ className, children }) {
-        return (
-          <div
-            className={className}
-            style={{
-              borderRadius: 18,
-              border: "1px solid rgba(237,231,217,0.12)",
-              background: "rgba(10,14,10,0.55)",
-              boxShadow: "0 20px 80px rgba(0,0,0,0.45)",
-              color: "rgba(237,231,217,0.95)",
-            }}
-          >
-            {children}
+      function renderFatalError(err) {
+        const root = document.getElementById("root");
+        if (!root) return;
+        const msg = (err && (err.stack || err.message)) || String(err || "Unknown error");
+        root.innerHTML = `
+          <div style="
+            min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+            font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background:#071E12; color:#EDE7D9;">
+            <div style="
+              max-width:960px; width:100%;
+              border:1px solid rgba(201,162,74,0.30);
+              background:rgba(201,162,74,0.06);
+              border-radius:24px; padding:20px;">
+              <div style="font-weight:800; font-size:18px; margin-bottom:10px;">
+                Site render error
+              </div>
+              <pre style="
+                white-space:pre-wrap; word-break:break-word; margin:0; padding:14px;
+                border-radius:16px; background:rgba(3,10,5,0.75);
+                border:1px solid rgba(201,162,74,0.25);
+                color:#EDE7D9; font-size:12px; line-height:1.35;">${msg}</pre>
+            </div>
           </div>
-        );
+        `;
       }
 
-      function Pill({ children }) {
-        return (
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              padding: "6px 10px",
-              borderRadius: 999,
-              border: "1px solid rgba(237,231,217,0.14)",
-              background: "rgba(237,231,217,0.06)",
-              color: "rgba(237,231,217,0.85)",
-              fontSize: 12,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}
-          >
-            {children}
-          </span>
-        );
-      }
+      try {
+        const { useMemo, useState } = React;
 
-      function Button({ variant = "ghost", onClick, href, children }) {
-        const base = {
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 10,
-          padding: "10px 14px",
-          borderRadius: 14,
-          fontWeight: 650,
-          fontSize: 14,
-          cursor: "pointer",
-          userSelect: "none",
-          textDecoration: "none",
-          border: "1px solid rgba(237,231,217,0.14)",
+        function cn() {
+          return Array.prototype.slice.call(arguments).filter(Boolean).join(" ");
+        }
+
+        const BRAND = {
+          name: "Star & Brass Group",
+          city: "Dallas, Texas",
+          phoneDisplay: "(469) 265-4633",
+          phoneHref: "tel:+14692654633",
+          emailDisplay: "Jimmy@starandbrassgroup.com",
+          emailHref: "mailto:Jimmy@starandbrassgroup.com",
+          areas: ["Highland Park", "Preston Hollow", "Historic Old East Dallas"],
         };
 
-        const styles =
-          variant === "primary"
-            ? {
-                background: "rgba(196,160,74,0.95)",
-                color: "rgba(12,14,12,1)",
-                border: "1px solid rgba(196,160,74,0.55)",
-              }
-            : variant === "dark"
-            ? {
-                background: "rgba(237,231,217,0.10)",
-                color: "rgba(237,231,217,0.95)",
-              }
-            : {
-                background: "transparent",
-                color: "rgba(237,231,217,0.95)",
-              };
+        const ASSETS = {
+          video: "estate-sweep.mp4",
+          concepts: {
+            material: "material.jpg",
+            elevation: "Elevation.jpg",
+            lighting: "lighting.jpg",
+            kitchen: "Kitchen.jpg",
+            bath: "Bath.jpg",
+            outdoor: "outdoor.jpg",
+          },
+        };
 
-        const merged = { ...base, ...styles };
+        const Icon = {
+          ArrowRight: (p) => (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
+              <path d="M5 12h14" />
+              <path d="M13 5l7 7-7 7" />
+            </svg>
+          ),
+          Phone: (p) => (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
+              <path d="M22 16.9v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.12.86.3 1.7.54 2.5a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.57-1.1a2 2 0 0 1 2.11-.45c.8.24 1.64.42 2.5.54A2 2 0 0 1 22 16.9z" />
+            </svg>
+          ),
+          Mail: (p) => (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
+              <path d="M4 4h16v16H4z" />
+              <path d="M22 6l-10 7L2 6" />
+            </svg>
+          ),
+          MapPin: (p) => (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
+              <path d="M12 21s7-4.5 7-11a7 7 0 0 0-14 0c0 6.5 7 11 7 11z" />
+              <circle cx="12" cy="10" r="2.5" />
+            </svg>
+          ),
+          Check: (p) => (
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          ),
+        };
 
-        if (href) {
+        function Pill({ children }) {
           return (
-            <a
-              href={href}
-              style={merged}
-              target={href.startsWith("http") ? "_blank" : undefined}
-              rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-            >
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#C9A24A]/25 bg-[#C9A24A]/6 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#EDE7D9]/80">
               {children}
-            </a>
+            </span>
           );
         }
 
-        return (
-          <button style={merged} onClick={onClick}>
-            {children}
-          </button>
-        );
-      }
+        function Button({ variant = "primary", href, onClick, className = "", children }) {
+          const base =
+            "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold tracking-wide transition active:scale-[0.99] no-select";
+          const styles = {
+            primary:
+              "bg-[#C9A24A] text-[#071E12] hover:bg-[#D7B66A] shadow-[0_12px_40px_rgba(201,162,74,0.14)]",
+            ghost:
+              "bg-transparent text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#C9A24A]/10",
+            dark:
+              "bg-[#05110A] text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#030A05]",
+          };
+          const Comp = href ? "a" : "button";
+          return (
+            <Comp href={href} onClick={onClick} className={cn(base, styles[variant], className)}>
+              {children}
+            </Comp>
+          );
+        }
 
-      function ArrowRight() {
-        return <span style={{ transform: "translateY(1px)" }}>→</span>;
-      }
-
-      function ProcessCards() {
-        const items = [
-          { title: "Pre-con clarity", text: "Budget and scope alignment first. Decisions documented." },
-          { title: "Field mindset", text: "Clean sequencing. Jobsite discipline. Trades set up to succeed." },
-          { title: "Office mindset", text: "Weekly updates. Selections controlled. Long-lead items locked early." },
-          { title: "Delivery package", text: "Closeout docs, contacts, and a clean punch process." },
-        ];
-
-        return (
-          <div style={{ display: "grid", gap: 12 }}>
-            {items.map((it) => (
-              <GlassCard key={it.title} className="p-5">
-                <div style={{ fontWeight: 800 }}>{it.title}</div>
-                <div style={{ marginTop: 8, color: "rgba(237,231,217,0.70)" }}>{it.text}</div>
-              </GlassCard>
-            ))}
+        const Divider = () => (
+          <div className="relative">
+            <div className="mx-auto h-px w-full max-w-6xl bg-gradient-to-r from-transparent via-[#C9A24A]/20 to-transparent" />
           </div>
         );
-      }
 
-      function HomePage({ onContact, goApproach, goStandards }) {
-        return (
-          <div
-            style={{
-              minHeight: "100vh",
-              background:
-                "radial-gradient(1200px 600px at 30% 10%, rgba(21,42,21,0.9), rgba(8,10,8,1))",
-              paddingBottom: 40,
-            }}
-          >
-            <div style={{ maxWidth: 1120, margin: "0 auto", padding: "42px 16px" }}>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                <Pill>Luxury custom homebuilder</Pill>
-                <Pill>Veteran-owned</Pill>
-                <Pill>{BRAND.city}</Pill>
-              </div>
+        const GlassCard = ({ children, className = "" }) => (
+          <div className={cn("rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4", className)}>
+            {children}
+          </div>
+        );
 
-              <h1 style={{ margin: "18px 0 0", fontSize: 56, lineHeight: 1.05, letterSpacing: "-0.02em" }}>
-                We build homes you don’t forget.
-              </h1>
+        const JobsiteLabel = () => (
+          <div className="jobsite-label">
+            <span className="inline-flex items-center rounded-full border border-[#C9A24A]/25 bg-[#030A05]/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#EDE7D9]/80 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
+              Jobsite Math
+            </span>
+          </div>
+        );
 
-              <p style={{ marginTop: 18, maxWidth: 920, color: "rgba(237,231,217,0.70)", lineHeight: 1.7 }}>
-                Star &amp; Brass Group is a Dallas-based startup run by two Marine Corps veterans. We bring building
-                science fundamentals and hands-on experience across building materials, multifamily, production luxury
-                townhomes, semi-custom, and full luxury custom homes—typically starting around $700/sf on a cost-plus basis.
-              </p>
+        const VisualDirectionVideo = () => (
+          <div className="relative overflow-hidden rounded-[32px] border border-[#C9A24A]/20 bg-[#C9A24A]/4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
+            <div className="aspect-video w-full">
+              <video
+                className="h-full w-full object-cover"
+                src={ASSETS.video}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+              ></video>
+            </div>
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/80 via-transparent to-transparent"></div>
+            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
+          </div>
+        );
 
-              <div style={{ marginTop: 22, display: "flex", flexWrap: "wrap", gap: 10 }}>
-                <Button variant="primary" onClick={onContact}>
-                  Request a consult <ArrowRight />
-                </Button>
-                <Button variant="ghost" onClick={goApproach}>
-                  How we work
-                </Button>
-                <Button variant="ghost" onClick={goStandards}>
-                  Our standard
-                </Button>
-              </div>
-
-              <GlassCard className="p-5" style={{ marginTop: 18 }}>
-                <div style={{ fontWeight: 900 }}>
-                  Build your dream with detail-oriented building science professionals.
+        function ImageWithFallback({ src, alt, label }) {
+          const [ok, setOk] = useState(true);
+          return (
+            <div className="absolute inset-0">
+              {ok ? (
+                <img
+                  src={src}
+                  alt={alt}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  onError={() => setOk(false)}
+                />
+              ) : (
+                <div className="h-full w-full bg-[radial-gradient(900px_400px_at_20%_10%,rgba(201,162,74,0.18),transparent_55%),radial-gradient(700px_350px_at_80%_30%,rgba(237,231,217,0.10),transparent_55%),linear-gradient(180deg,rgba(3,10,5,0.35),rgba(7,30,18,0.90))]">
+                  <div className="absolute inset-0 flex items-end p-5">
+                    <div className="text-xs uppercase tracking-[0.22em] text-[#EDE7D9]/70">
+                      Missing file:
+                      <span className="ml-2 text-[#C9A24A]">{label}</span>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ marginTop: 8, color: "rgba(237,231,217,0.70)" }}>
-                  Clear decisions, disciplined execution, and a team built to protect the standard.
-                </div>
-              </GlassCard>
+              )}
+            </div>
+          );
+        }
 
-              <div style={{ marginTop: 18 }}>
-                <GlassCard className="p-5">
-                  <div style={{ fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(237,231,217,0.60)" }}>
-                    Startup, serious systems
+        function ConceptGallery() {
+          const items = useMemo(
+            () => [
+              { title: "Material direction", meta: "Brass, stone, warm woods", img: ASSETS.concepts.material },
+              { title: "Elevation study", meta: "Clean lines, deep shadows", img: ASSETS.concepts.elevation },
+              { title: "Lighting plan", meta: "Layered, warm, restrained", img: ASSETS.concepts.lighting },
+              { title: "Kitchen concept", meta: "Real storage, real function", img: ASSETS.concepts.kitchen },
+              { title: "Bath concept", meta: "Quiet luxury, durable", img: ASSETS.concepts.bath },
+              { title: "Outdoor living", meta: "Dallas heat-ready", img: ASSETS.concepts.outdoor },
+            ],
+            []
+          );
+
+          return (
+            <div className="grid gap-4 md:grid-cols-3">
+              {items.map((it) => (
+                <div key={it.title} className="relative overflow-hidden rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4">
+                  <div className="relative aspect-[4/3] w-full overflow-hidden">
+                    <ImageWithFallback src={it.img} alt={it.title} label={it.img} />
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/75 via-[#071E12]/10 to-transparent"></div>
+                    <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
+                  </div>
+                  <div className="p-5">
+                    <div className="text-sm font-semibold text-[#EDE7D9]">{it.title}</div>
+                    <div className="mt-1 text-xs text-[#EDE7D9]/60">{it.meta}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        }
+
+        function ProcessCards() {
+          const rows = [
+            { k: "1. Pre Construction Planning", v: "Initial meetings with your architect/design team—or an interview process with our preferred partners." },
+            { k: "2. Field Mindset", v: "Set trades up for success through clarity: clean scopes, sequencing, and jobsite readiness." },
+            { k: "3. Office Mindset", v: "Weekly homeowner meetings for updates and selections approvals. Timely purchase orders so materials are onsite when needed." },
+            { k: "4. Detailed Home Delivery", v: "A fully searchable digital turnover package with warranties, trade contacts, final build sheet, and appliance documentation." },
+          ];
+
+          return (
+            <div className="grid gap-3">
+              {rows.map((r) => (
+                <div key={r.k} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">
+                  <div className="text-sm font-semibold">{r.k}</div>
+                  <div className="mt-1 text-sm text-[#EDE7D9]/70">{r.v}</div>
+                </div>
+              ))}
+            </div>
+          );
+        }
+
+        function FAQ() {
+          const faqs = [
+            { q: "Do you work cost-plus?", a: "Yes. We build primarily on a cost-plus basis with clear scope, allowances, and change control." },
+            { q: "Do you require an architect?", a: "We can start with your existing architect, or we can help you interview and select from preferred partners." },
+            { q: "What neighborhoods do you focus on?", a: "Highland Park, Preston Hollow, and Historic Old East Dallas." },
+            { q: "Are you veteran-owned?", a: "Yes. Veteran-owned is part of who we are, but we lead with execution and standards." },
+          ];
+
+          return (
+            <div className="grid gap-3">
+              {faqs.map((f) => (
+                <div key={f.q} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-5">
+                  <div className="text-sm font-semibold">{f.q}</div>
+                  <div className="mt-2 text-sm text-[#EDE7D9]/70">{f.a}</div>
+                </div>
+              ))}
+            </div>
+          );
+        }
+
+        function ContactCard() {
+          return (
+            <GlassCard className="p-6">
+              <div className="text-sm font-semibold">Contact</div>
+
+              <div className="mt-4 grid gap-3">
+                <a href={BRAND.phoneHref} className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                      <Icon.Phone className="h-5 w-5 text-[#C9A24A]" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">Call</div>
+                      <div className="text-sm text-[#EDE7D9]/70">{BRAND.phoneDisplay}</div>
+                    </div>
+                  </div>
+                  <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
+                </a>
+
+                <a href={BRAND.emailHref} className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                      <Icon.Mail className="h-5 w-5 text-[#C9A24A]" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">Email</div>
+                      <div className="text-sm text-[#EDE7D9]/70">{BRAND.emailDisplay}</div>
+                    </div>
+                  </div>
+                  <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
+                </a>
+
+                <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5">
+                  <div className="flex items-center gap-3">
+                    <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
+                      <Icon.MapPin className="h-5 w-5 text-[#C9A24A]" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold">Service areas</div>
+                      <div className="text-sm text-[#EDE7D9]/70">Dallas</div>
+                    </div>
                   </div>
 
-                  <div style={{ marginTop: 12 }}>
-                    <ProcessCards />
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {BRAND.areas.map((a) => <Pill key={a}>{a}</Pill>)}
+                  </div>
+                </div>
+              </div>
+            </GlassCard>
+          );
+        }
+
+        function PageWrap({ eyebrow, title, subtitle, children, right }) {
+          return (
+            <div className="mx-auto max-w-6xl px-4 pb-16 pt-10">
+              <div className="grid gap-8 md:grid-cols-2 md:items-end">
+                <div>
+                  <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">{eyebrow}</div>
+                  <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h1>
+                  {subtitle ? (
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">{subtitle}</p>
+                  ) : null}
+                </div>
+                {right ? <div className="md:justify-self-end">{right}</div> : null}
+              </div>
+              <div className="mt-8">{children}</div>
+            </div>
+          );
+        }
+
+        function HomePage({ onContact, onApproach, onStandards }) {
+          return (
+            <>
+              <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-12 pt-10 md:grid-cols-2 md:items-center md:pb-16">
+                <div>
+                  <div className="flex flex-wrap gap-2">
+                    <Pill>Luxury custom homebuilder</Pill>
+                    <Pill>Veteran-owned</Pill>
+                    <Pill>{BRAND.city}</Pill>
                   </div>
 
-                  <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 10 }}>
-                    <Button variant="dark" href={LOT_SCOUT_URL}>
-                      Launch Copilot <ArrowRight />
+                  <h1 className="mt-6 text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+                    We build homes you don’t forget.
+                  </h1>
+
+                  <p className="mt-5 max-w-xl text-base leading-relaxed text-[#EDE7D9]/70 md:text-lg">
+                    Star &amp; Brass Group is a Dallas-based startup run by two Marine Corps veterans. We bring building science fundamentals and hands-on experience across building materials, multifamily, production luxury townhomes, semi-custom, and full luxury custom homes—typically starting around $700/sf on a cost-plus basis.
+                  </p>
+
+                  <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                    <Button variant="primary" onClick={onContact}>
+                      Request a consult <Icon.ArrowRight className="h-4 w-4" />
                     </Button>
-                    <Button variant="dark" href={BRAND.emailHref}>Email us</Button>
-                    <Button variant="ghost" href={BRAND.phoneHref}>Call now</Button>
+                    <Button variant="ghost" onClick={onApproach}>How we work</Button>
+                    <Button variant="ghost" onClick={onStandards}>Our standard</Button>
                   </div>
-                </GlassCard>
+
+                  <GlassCard className="mt-8 p-5">
+                    <div className="text-sm font-semibold">Build your dream with detail-oriented building science professionals.</div>
+                    <div className="mt-1 text-sm text-[#EDE7D9]/70">Clear decisions, disciplined execution, and a team built to protect the standard.</div>
+                  </GlassCard>
+                </div>
+
+                <div className="relative">
+                  <GlassCard className="p-4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
+                    <div className="rounded-[28px] border border-[#C9A24A]/20 bg-gradient-to-br from-[#C9A24A]/12 via-[#C9A24A]/7 to-transparent p-5">
+                      <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/60">Startup, serious systems</div>
+                      <div className="mt-6"><ProcessCards /></div>
+                      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                        <Button variant="dark" href={BRAND.emailHref} className="w-full">
+                          <Icon.Mail className="h-4 w-4" /> Email us
+                        </Button>
+                        <Button variant="ghost" href={BRAND.phoneHref} className="w-full">
+                          <Icon.Phone className="h-4 w-4" /> Call now
+                        </Button>
+                      </div>
+                    </div>
+                  </GlassCard>
+                </div>
               </div>
 
               <Divider />
 
-              <div>
-                <div style={{ fontSize: 12, letterSpacing: "0.22em", textTransform: "uppercase", color: "rgba(237,231,217,0.55)" }}>
-                  Visual direction
+              <div className="mx-auto max-w-6xl px-4 py-14">
+                <div className="grid gap-8 md:grid-cols-2 md:items-end">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">Visual direction</div>
+                    <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Cinematic concept, photo-ready standards</h2>
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">
+                      We’re a startup, so we won’t borrow photos from past employers. Until our first builds are shot, we show concept media and material direction to communicate taste and standards.
+                    </p>
+                  </div>
+                  <div className="flex justify-start md:justify-end">
+                    <Button variant="ghost" onClick={onContact}>Talk scope <Icon.ArrowRight className="h-4 w-4" /></Button>
+                  </div>
                 </div>
-                <h2 style={{ marginTop: 10, fontSize: 34, letterSpacing: "-0.02em" }}>
-                  Cinematic concept, photo-ready standards
-                </h2>
-                <p style={{ marginTop: 10, color: "rgba(237,231,217,0.70)", maxWidth: 840, lineHeight: 1.7 }}>
-                  We’re a startup, so we won’t borrow photos from past employers. Until our first builds are shot, we show
-                  concept media and material direction to communicate taste and standards.
-                </p>
+
+                <div className="mt-8">
+                  <VisualDirectionVideo />
+                  <div className="mt-6"><ConceptGallery /></div>
+                  <div className="mx-auto max-w-6xl px-4 pb-8 mt-12">
+  <div className="text-base text-[#EDE7D9]/60">
+    X-Factor: The concept gallery includes graceful image fallbacks—if a photo is missing or misnamed, the site shows a clean branded placeholder instead of breaking the layout. This keeps the experience polished while we’re a startup building our first portfolio.
+  </div>
+</div>
+
+                </div>
               </div>
-            </div>
-          </div>
-        );
-      }
+            </>
+          );
+        }
 
-      function ApproachPage({ onContact }) {
-        return (
-          <div style={{ maxWidth: 1120, margin: "0 auto", padding: "32px 16px", color: "rgba(237,231,217,0.95)" }}>
-            <h2 style={{ margin: 0, fontSize: 34 }}>How we run work</h2>
-            <p style={{ marginTop: 10, color: "rgba(237,231,217,0.70)" }}>
-              Predictable outcomes come from disciplined systems.
-            </p>
-            <div style={{ marginTop: 14 }}>
-              <Button variant="dark" href={LOT_SCOUT_URL}>Launch Copilot <ArrowRight /></Button>
-              <span style={{ marginLeft: 10 }} />
-              <Button variant="ghost" onClick={onContact}>Start a build <ArrowRight /></Button>
-            </div>
-            <div style={{ marginTop: 18 }}>
-              <ProcessCards />
-            </div>
-          </div>
-        );
-      }
-
-      function StandardsPage({ onContact }) {
-        return (
-          <div style={{ maxWidth: 1120, margin: "0 auto", padding: "32px 16px", color: "rgba(237,231,217,0.95)" }}>
-            <h2 style={{ margin: 0, fontSize: 34 }}>What we protect</h2>
-            <p style={{ marginTop: 10, color: "rgba(237,231,217,0.70)" }}>
-              Documentation, sequencing, finish quality, and clean closeout.
-            </p>
-            <div style={{ marginTop: 14 }}>
-              <Button variant="ghost" onClick={onContact}>Request a consult <ArrowRight /></Button>
-            </div>
-          </div>
-        );
-      }
-
-      function App() {
-        const [page, setPage] = React.useState("home");
-
-        const onContact = () => {
-          window.location.href = BRAND.emailHref;
-        };
-
-        return (
-          <>
-            <div
-              style={{
-                position: "sticky",
-                top: 0,
-                zIndex: 50,
-                backdropFilter: "blur(10px)",
-                background: "rgba(8,10,8,0.65)",
-                borderBottom: "1px solid rgba(237,231,217,0.10)",
-              }}
+        function ApproachPage({ onContact }) {
+          return (
+            <PageWrap
+              eyebrow="Approach"
+              title="How we run work"
+              subtitle="Predictable outcomes come from disciplined systems."
+              right={<Button variant="ghost" onClick={onContact}>Start a build <Icon.ArrowRight className="h-4 w-4" /></Button>}
             >
-              <div style={{ maxWidth: 1120, margin: "0 auto", padding: "10px 16px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-                <div style={{ fontWeight: 900, letterSpacing: "0.08em", color: "rgba(237,231,217,0.95)" }}>
-                  STAR &amp; BRASS
-                </div>
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                  <Button variant="ghost" onClick={() => setPage("home")}>Home</Button>
-                  <Button variant="ghost" onClick={() => setPage("approach")}>Approach</Button>
-                  <Button variant="ghost" onClick={() => setPage("standards")}>Standard</Button>
-                  <Button variant="dark" href={LOT_SCOUT_URL}>Launch Copilot <ArrowRight /></Button>
-                </div>
+              <div className="grid gap-8 md:grid-cols-2">
+                <ProcessCards />
+                <GlassCard className="p-6">
+                  <div className="text-sm font-semibold">Owner experience</div>
+                  <div className="mt-2 text-sm text-[#EDE7D9]/70">
+                    Tight scopes. Clean sequencing. Decisions made with context. Site stays disciplined.
+                  </div>
+                </GlassCard>
               </div>
+            </PageWrap>
+          );
+        }
+
+        function CapabilitiesPage({ onContact }) {
+          return (
+            <PageWrap
+              eyebrow="Capabilities"
+              title="What we build"
+              subtitle="Luxury custom homes and major renovations, executed with building science fundamentals."
+              right={<Button variant="ghost" onClick={onContact}>Talk scope <Icon.ArrowRight className="h-4 w-4" /></Button>}
+            >
+              <div className="grid gap-6 md:grid-cols-2">
+                <GlassCard className="p-6"><div className="text-sm font-semibold">Custom homes</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Full-service build management from precon through closeout.</div></GlassCard>
+                <GlassCard className="p-6"><div className="text-sm font-semibold">Major renovations</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Structural and envelope work planned to protect the final product.</div></GlassCard>
+                <GlassCard className="p-6 md:col-span-2"><div className="text-sm font-semibold">Team integration</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Work with your architect + designer, or we’ll help you interview and select partners.</div></GlassCard>
+              </div>
+            </PageWrap>
+          );
+        }
+
+        function StandardsPage({ onContact }) {
+          return (
+            <PageWrap
+              eyebrow="Standards"
+              title="The standard"
+              subtitle="A quiet, disciplined jobsite that protects schedule, craftsmanship, and finishes."
+              right={<Button variant="ghost" onClick={onContact}>Start a build <Icon.ArrowRight className="h-4 w-4" /></Button>}
+            >
+              <div className="grid gap-6 md:grid-cols-2">
+                {[
+                  { t:"Clarity", d:"Scopes written for accountability. No fuzzy handoffs." },
+                  { t:"Sequencing", d:"Work planned around long-lead items and critical path." },
+                  { t:"Clean logistics", d:"Material flow that keeps the site tight and safe." },
+                  { t:"Durable assemblies", d:"Building science fundamentals applied where it matters." },
+                ].map((x)=>(
+                  <GlassCard key={x.t} className="p-6">
+                    <div className="text-sm font-semibold">{x.t}</div>
+                    <div className="mt-2 text-sm text-[#EDE7D9]/70">{x.d}</div>
+                  </GlassCard>
+                ))}
+              </div>
+            </PageWrap>
+          );
+        }
+
+        function FAQPage({ onContact }) {
+          return (
+            <PageWrap
+              eyebrow="FAQ"
+              title="Answers upfront"
+              subtitle="The basics clients ask before we kick off."
+              right={<Button variant="ghost" onClick={onContact}>Contact <Icon.ArrowRight className="h-4 w-4" /></Button>}
+            >
+              <FAQ />
+            </PageWrap>
+          );
+        }
+
+        function ContactPage() {
+          return (
+            <PageWrap
+              eyebrow="Contact"
+              title="Let’s talk about your build"
+              subtitle=""
+            >
+              <div className="grid gap-8 md:grid-cols-2 md:items-start">
+                <GlassCard className="p-6">
+                  <div className="text-sm font-semibold">Before we talk numbers</div>
+                  <div className="mt-3 grid gap-3 text-sm text-[#EDE7D9]/75">
+                    {["Where is the property?","New build or major renovation?","Architect/design team selected?","Target start date?"].map((x)=>(
+                      <div key={x} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">{x}</div>
+                    ))}
+                  </div>
+                </GlassCard>
+                <ContactCard />
+              </div>
+            </PageWrap>
+          );
+        }
+
+        function App() {
+          const nav = useMemo(() => ([
+            { id:"home", label:"Home" },
+            { id:"approach", label:"Approach" },
+            { id:"capabilities", label:"Capabilities" },
+            { id:"standards", label:"Standards" },
+            { id:"faq", label:"FAQ" },
+            { id:"contact", label:"Contact" },
+          ]), []);
+
+          const [page, setPage] = useState("home");
+
+          return (
+            <div className="min-h-screen">
+              <JobsiteLabel />
+
+              <div className="pointer-events-none fixed inset-0">
+                <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_15%_10%,rgba(201,162,74,0.10),transparent_60%)]"></div>
+                <div className="absolute inset-0 bg-[radial-gradient(700px_450px_at_85%_30%,rgba(201,162,74,0.08),transparent_60%)]"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-[#071E12] via-[#05110A] to-[#030A05]"></div>
+              </div>
+
+              <header className="sticky top-0 z-50 border-b border-[#C9A24A]/20 bg-[#071E12]/75 backdrop-blur">
+                <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+                  <button onClick={()=>setPage("home")} className="text-left no-select">
+                    <div className="text-lg font-semibold">{BRAND.name}</div>
+                    <div className="text-sm text-[#EDE7D9]/60">{BRAND.city}</div>
+                  </button>
+
+                  <nav className="hidden md:flex items-center gap-6">
+                    {nav.map((n)=>(
+                      <button
+                        key={n.id}
+                        onClick={()=>setPage(n.id)}
+                        className={cn(
+                          "text-[11px] font-semibold tracking-[0.22em] uppercase transition no-select",
+                          page===n.id ? "text-[#C9A24A]" : "text-[#EDE7D9]/70 hover:text-[#EDE7D9]"
+                        )}
+                      >
+                        {n.label}
+                      </button>
+                    ))}
+                  </nav>
+
+                  <div className="flex items-center gap-2">
+                    <Button variant="ghost" href={BRAND.phoneHref}><Icon.Phone className="h-4 w-4" />Call</Button>
+                    <Button variant="primary" onClick={()=>setPage("contact")}>Start a build <Icon.ArrowRight className="h-4 w-4" /></Button>
+                  </div>
+                </div>
+              </header>
+
+              <main className="relative">
+                {page==="home" ? <HomePage onContact={()=>setPage("contact")} onApproach={()=>setPage("approach")} onStandards={()=>setPage("standards")} /> : null}
+                {page==="approach" ? <ApproachPage onContact={()=>setPage("contact")} /> : null}
+                {page==="capabilities" ? <CapabilitiesPage onContact={()=>setPage("contact")} /> : null}
+                {page==="standards" ? <StandardsPage onContact={()=>setPage("contact")} /> : null}
+                {page==="faq" ? <FAQPage onContact={()=>setPage("contact")} /> : null}
+                {page==="contact" ? <ContactPage /> : null}
+
+                <footer className="relative border-t border-[#C9A24A]/20 bg-[#05110A]/85">
+                  <div className="mx-auto max-w-6xl px-4 py-10">
+                    <div className="grid gap-6 md:grid-cols-2 md:items-center">
+                      <div>
+                        <div className="text-sm font-semibold">{BRAND.name}</div>
+                        <div className="text-xs text-[#EDE7D9]/60">Veteran-owned • Luxury custom homes • {BRAND.city}</div>
+                      </div>
+                      <div className="flex flex-wrap gap-4 md:justify-end">
+                        {nav.map((n)=>(
+                          <button key={n.id} onClick={()=>setPage(n.id)} className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55 hover:text-[#EDE7D9] no-select">
+                            {n.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </footer>
+              </main>
             </div>
+          );
+        }
 
-            {page === "home" ? (
-              <HomePage
-                onContact={onContact}
-                goApproach={() => setPage("approach")}
-                goStandards={() => setPage("standards")}
-              />
-            ) : page === "approach" ? (
-              <ApproachPage onContact={onContact} />
-            ) : (
-              <StandardsPage onContact={onContact} />
-            )}
-          </>
-        );
+        ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+      } catch (err) {
+        renderFatalError(err);
       }
-
-      const rootEl = document.getElementById("root");
-      const root = ReactDOM.createRoot(rootEl);
-      root.render(<App />);
     </script>
   </body>
 </html>
