@@ -402,6 +402,16 @@
                     <div className="rounded-[28px] border border-[#C9A24A]/20 bg-gradient-to-br from-[#C9A24A]/12 via-[#C9A24A]/7 to-transparent p-5">
                       <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/60">Startup, serious systems</div>
                       <div className="mt-6"><ProcessCards /></div>
+                      <div className="mt-4 flex flex-wrap gap-3">
+  <a
+    href="https://ais-pre-z2wsyvthr1nd3dddxitc64-181965608527.us-east1.run.app"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex items-center gap-2 rounded-xl border border-[#EDE7D9]/25 bg-[#EDE7D9]/10 px-4 py-2 text-sm font-semibold text-[#EDE7D9] hover:bg-[#EDE7D9]/15"
+  >
+    Launch Copilot <Icon.ArrowRight className="h-4 w-4" />
+  </a>
+</div>
                       <div className="mt-6 grid gap-3 sm:grid-cols-2">
                         <Button variant="dark" href={BRAND.emailHref} className="w-full">
                           <Icon.Mail className="h-4 w-4" /> Email us
@@ -414,44 +424,7 @@
                   </GlassCard>
                 </div>
               </div>
-<div className="mt-6 flex flex-wrap gap-3">
-  <a
-    href="https://ais-pre-z2wsyvthr1nd3dddxitc64-181965608527.us-east1.run.app"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="inline-flex items-center gap-2 rounded-xl border border-[#EDE7D9]/25 bg-[#EDE7D9]/10 px-4 py-2 text-sm font-semibold text-[#EDE7D9] hover:bg-[#EDE7D9]/15"
-  >
-    Launch Copilot <Icon.ArrowRight className="h-4 w-4" />
-  </a>
-</div>
-
-<Divider />
-
-<div className="mx-auto max-w-6xl px-4 py-14">
-  <div className="grid gap-8 md:grid-cols-2 md:items-end">
-    <div>
-      <div className="text-[11px] uppercase ...">Visual direction</div>
-      ...
-              <Divider />
-
-              <div className="mx-auto max-w-6xl px-4 py-14">
-                <div className="grid gap-8 md:grid-cols-2 md:items-end">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">Visual direction</div>
-                    <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Cinematic concept, photo-ready standards</h2>
-                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">
-                      We’re a startup, so we won’t borrow photos from past employers. Until our first builds are shot, we show concept media and material direction to communicate taste and standards.
-                    </p>
-                  </div>
                 
-                </div>
-
-                <div className="mt-8">
-                  <VisualDirectionVideo />
-                  <div className="mt-6"><ConceptGallery /></div>
-                  <div className="mx-auto max-w-6xl px-4 pb-8 mt-12">
-  <div className="text-base text-[#EDE7D9]/60">
-
         function ApproachPage({ onContact }) {
           return (
             <PageWrap
@@ -461,13 +434,7 @@
               right={<Button variant="ghost" onClick={onContact}>Start a build <Icon.ArrowRight className="h-4 w-4" /></Button>}
             >
               <div className="grid gap-8 md:grid-cols-2">
-                <ProcessCards />
-                <GlassCard className="p-6">
-                  <div className="text-sm font-semibold">Owner experience</div>
-                  <div className="mt-2 text-sm text-[#EDE7D9]/70">
-                    Tight scopes. Clean sequencing. Decisions made with context. Site stays disciplined.
-                  </div>
-                </GlassCard>
+            
               </div>
             </PageWrap>
           );
