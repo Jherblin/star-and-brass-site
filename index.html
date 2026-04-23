@@ -1,8 +1,8 @@
-F<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Star & Brass Group</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,36 +12,20 @@ F<!doctype html>
 
     <style>
       html, body { height: 100%; }
-      video { display:block; }
-
-      /* Always keep Chatling above everything */
-      #chtl-script, iframe, .chtl-widget, .chatling-widget { z-index: 999999 !important; }
-
-      .no-select { -webkit-user-select:none; user-select:none; }
-
-      ::-webkit-scrollbar { width:10px; }
-      ::-webkit-scrollbar-thumb { background: rgba(201,162,74,0.25); border-radius:999px; }
-      ::-webkit-scrollbar-track { background: rgba(7,30,18,0.6); }
-
-      /* Label above Chatling bubble */
-      .jobsite-label {
-        position: fixed;
-        right: 18px;
-        bottom: 92px; /* sits above the bubble */
-        z-index: 999998;
-        pointer-events: none;
+      body {
+        background: #ffffff;
+        color: #0a0a0a;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
+      .no-select { -webkit-user-select: none; user-select: none; }
+      ::-webkit-scrollbar { width: 10px; }
+      ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 999px; }
+      ::-webkit-scrollbar-track { background: #f5f5f5; }
     </style>
   </head>
 
-  <body class="bg-[#071E12] text-[#EDE7D9]">
+  <body>
     <div id="root"></div>
-
-    <!-- Chatling (YOUR embed) -->
-    <script>
-      window.chtlConfig = { chatbotId: "6976442446" };
-    </script>
-    <script async data-id="6976442446" id="chtl-script" type="text/javascript" src="https://chatling.ai/js/embed.js"></script>
 
     <script type="text/babel">
       function renderFatalError(err) {
@@ -49,23 +33,10 @@ F<!doctype html>
         if (!root) return;
         const msg = (err && (err.stack || err.message)) || String(err || "Unknown error");
         root.innerHTML = `
-          <div style="
-            min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
-            font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-            background:#071E12; color:#EDE7D9;">
-            <div style="
-              max-width:960px; width:100%;
-              border:1px solid rgba(201,162,74,0.30);
-              background:rgba(201,162,74,0.06);
-              border-radius:24px; padding:20px;">
-              <div style="font-weight:800; font-size:18px; margin-bottom:10px;">
-                Site render error
-              </div>
-              <pre style="
-                white-space:pre-wrap; word-break:break-word; margin:0; padding:14px;
-                border-radius:16px; background:rgba(3,10,5,0.75);
-                border:1px solid rgba(201,162,74,0.25);
-                color:#EDE7D9; font-size:12px; line-height:1.35;">${msg}</pre>
+          <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#fff;color:#111;font-family:Inter,system-ui,sans-serif;">
+            <div style="max-width:960px;width:100%;border:1px solid rgba(0,0,0,.12);border-radius:24px;padding:24px;">
+              <div style="font-weight:800;font-size:18px;margin-bottom:12px;">Site render error</div>
+              <pre style="white-space:pre-wrap;word-break:break-word;margin:0;padding:16px;border-radius:16px;background:#f7f7f7;border:1px solid rgba(0,0,0,.08);font-size:12px;line-height:1.4;">${msg}</pre>
             </div>
           </div>
         `;
@@ -80,24 +51,43 @@ F<!doctype html>
 
         const BRAND = {
           name: "Star & Brass Group",
-          city: "Dallas, Texas",
+          city: "Dallas-based | Serving DFW",
           phoneDisplay: "(469) 265-4633",
           phoneHref: "tel:+14692654633",
-          emailDisplay: "Jimmy@starandbrassgroup.com",
-          emailHref: "mailto:Jimmy@starandbrassgroup.com",
-          areas: ["Highland Park", "Preston Hollow", "Historic Old East Dallas"],
+          emailDisplay: "Jimmy@StarAndBrassGroup.com",
+          emailHref: "mailto:Jimmy@StarAndBrassGroup.com",
+          websiteDisplay: "www.StarAndBrassGroup.com",
+          websiteHref: "https://www.StarAndBrassGroup.com",
+          serviceArea: "Luxury custom residential projects across DFW",
+          contacts: [
+            {
+              name: "Jimmy Herblin",
+              title: "Chief Executive Officer",
+              phoneDisplay: "(469) 265-4633",
+              phoneHref: "tel:+14692654633",
+              emailDisplay: "Jimmy@StarAndBrassGroup.com",
+              emailHref: "mailto:Jimmy@StarAndBrassGroup.com",
+            },
+            {
+              name: "Cyle Burton",
+              title: "Chief Operating Officer",
+              phoneDisplay: "(951) 514-0203",
+              phoneHref: "tel:+19515140203",
+              emailDisplay: "Cyle@StarAndBrassGroup.com",
+              emailHref: "mailto:Cyle@StarAndBrassGroup.com",
+            }
+          ]
         };
 
         const ASSETS = {
-          video: "estate-sweep.mp4",
-          concepts: {
-            material: "material.jpg",
-            elevation: "Elevation.jpg",
-            lighting: "lighting.jpg",
-            kitchen: "Kitchen.jpg",
-            bath: "Bath.jpg",
-            outdoor: "outdoor.jpg",
-          },
+          video: "estate-sweep.mp4"
+        };
+
+        const COPY = {
+          summary: "Star & Brass Group is a Dallas-based luxury custom homebuilder serving the broader DFW market. Founded by Marine Corps veterans Jimmy Herblin and Cyle Burton, the company is purpose-built for high-end custom homes, with a focus on protecting design intent, maintaining disciplined budgets and schedules, and delivering a building experience that serves both architects and clients well.",
+          heroHeadline: "Disciplined approach to luxury custom home projects.",
+          heroBody: "Star & Brass Group is built around a simple belief: exceptional homes require exceptional management. We bring structure to custom projects through strong preconstruction, clear budgeting, schedule discipline, and field execution that protects both design intent and owner experience.",
+          approachBody: "Our role is to function as a builder-partner that brings clarity to complex projects, identifies risk early, and creates a more professional building experience from preconstruction through closeout.",
         };
 
         const Icon = {
@@ -118,10 +108,11 @@ F<!doctype html>
               <path d="M22 6l-10 7L2 6" />
             </svg>
           ),
-          MapPin: (p) => (
+          Globe: (p) => (
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" {...p}>
-              <path d="M12 21s7-4.5 7-11a7 7 0 0 0-14 0c0 6.5 7 11 7 11z" />
-              <circle cx="12" cy="10" r="2.5" />
+              <circle cx="12" cy="12" r="10" />
+              <path d="M2 12h20" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
             </svg>
           ),
           Check: (p) => (
@@ -131,24 +122,11 @@ F<!doctype html>
           ),
         };
 
-        function Pill({ children }) {
-          return (
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#C9A24A]/25 bg-[#C9A24A]/6 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-[#EDE7D9]/80">
-              {children}
-            </span>
-          );
-        }
-
         function Button({ variant = "primary", href, onClick, className = "", children }) {
-          const base =
-            "inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold tracking-wide transition active:scale-[0.99] no-select";
+          const base = "inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition no-select";
           const styles = {
-            primary:
-              "bg-[#C9A24A] text-[#071E12] hover:bg-[#D7B66A] shadow-[0_12px_40px_rgba(201,162,74,0.14)]",
-            ghost:
-              "bg-transparent text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#C9A24A]/10",
-            dark:
-              "bg-[#05110A] text-[#EDE7D9] border border-[#C9A24A]/25 hover:bg-[#030A05]",
+            primary: "bg-black text-white hover:bg-neutral-800",
+            ghost: "border border-black/15 bg-white text-black hover:bg-neutral-100",
           };
           const Comp = href ? "a" : "button";
           return (
@@ -158,204 +136,20 @@ F<!doctype html>
           );
         }
 
-        const Divider = () => (
-          <div className="relative">
-            <div className="mx-auto h-px w-full max-w-6xl bg-gradient-to-r from-transparent via-[#C9A24A]/20 to-transparent" />
-          </div>
+        const Divider = () => <div className="mx-auto h-px max-w-6xl bg-black/10" />;
+
+        const Card = ({ children, className = "" }) => (
+          <div className={cn("rounded-[28px] border border-black/10 bg-white", className)}>{children}</div>
         );
 
-        const GlassCard = ({ children, className = "" }) => (
-          <div className={cn("rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4", className)}>
-            {children}
-          </div>
-        );
-
-        const JobsiteLabel = () => (
-          <div className="jobsite-label">
-            <span className="inline-flex items-center rounded-full border border-[#C9A24A]/25 bg-[#030A05]/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#EDE7D9]/80 shadow-[0_12px_40px_rgba(0,0,0,0.35)]">
-              Jobsite Math
-            </span>
-          </div>
-        );
-
-        const VisualDirectionVideo = () => (
-          <div className="relative overflow-hidden rounded-[32px] border border-[#C9A24A]/20 bg-[#C9A24A]/4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
-            <div className="aspect-video w-full">
-              <video
-                className="h-full w-full object-cover"
-                src={ASSETS.video}
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-              ></video>
-            </div>
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/80 via-transparent to-transparent"></div>
-            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
-          </div>
-        );
-
-        function ImageWithFallback({ src, alt, label }) {
-          const [ok, setOk] = useState(true);
+        function SectionWrap({ eyebrow, title, subtitle, children, right }) {
           return (
-            <div className="absolute inset-0">
-              {ok ? (
-                <img
-                  src={src}
-                  alt={alt}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                  onError={() => setOk(false)}
-                />
-              ) : (
-                <div className="h-full w-full bg-[radial-gradient(900px_400px_at_20%_10%,rgba(201,162,74,0.18),transparent_55%),radial-gradient(700px_350px_at_80%_30%,rgba(237,231,217,0.10),transparent_55%),linear-gradient(180deg,rgba(3,10,5,0.35),rgba(7,30,18,0.90))]">
-                  <div className="absolute inset-0 flex items-end p-5">
-                    <div className="text-xs uppercase tracking-[0.22em] text-[#EDE7D9]/70">
-                      Missing file:
-                      <span className="ml-2 text-[#C9A24A]">{label}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        }
-
-        function ConceptGallery() {
-          const items = useMemo(
-            () => [
-              { title: "Material direction", meta: "Brass, stone, warm woods", img: ASSETS.concepts.material },
-              { title: "Elevation study", meta: "Clean lines, deep shadows", img: ASSETS.concepts.elevation },
-              { title: "Lighting plan", meta: "Layered, warm, restrained", img: ASSETS.concepts.lighting },
-              { title: "Kitchen concept", meta: "Real storage, real function", img: ASSETS.concepts.kitchen },
-              { title: "Bath concept", meta: "Quiet luxury, durable", img: ASSETS.concepts.bath },
-              { title: "Outdoor living", meta: "Dallas heat-ready", img: ASSETS.concepts.outdoor },
-            ],
-            []
-          );
-
-          return (
-            <div className="grid gap-4 md:grid-cols-3">
-              {items.map((it) => (
-                <div key={it.title} className="relative overflow-hidden rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4">
-                  <div className="relative aspect-[4/3] w-full overflow-hidden">
-                    <ImageWithFallback src={it.img} alt={it.title} label={it.img} />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#071E12]/75 via-[#071E12]/10 to-transparent"></div>
-                    <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-[#C9A24A]/20"></div>
-                  </div>
-                  <div className="p-5">
-                    <div className="text-sm font-semibold text-[#EDE7D9]">{it.title}</div>
-                    <div className="mt-1 text-xs text-[#EDE7D9]/60">{it.meta}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          );
-        }
-
-        function ProcessCards() {
-          const rows = [
-            { k: "1. Pre Construction Planning", v: "Initial meetings with your architect/design team—or an interview process with our preferred partners." },
-            { k: "2. Field Mindset", v: "Set trades up for success through clarity: clean scopes, sequencing, and jobsite readiness." },
-            { k: "3. Office Mindset", v: "Weekly homeowner meetings for updates and selections approvals. Timely purchase orders so materials are onsite when needed." },
-            { k: "4. Detailed Home Delivery", v: "A fully searchable digital turnover package with warranties, trade contacts, final build sheet, and appliance documentation." },
-          ];
-
-          return (
-            <div className="grid gap-3">
-              {rows.map((r) => (
-                <div key={r.k} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">
-                  <div className="text-sm font-semibold">{r.k}</div>
-                  <div className="mt-1 text-sm text-[#EDE7D9]/70">{r.v}</div>
-                </div>
-              ))}
-            </div>
-          );
-        }
-
-        function FAQ() {
-          const faqs = [
-            { q: "Do you work cost-plus?", a: "Yes. We build primarily on a cost-plus basis with clear scope, allowances, and change control." },
-            { q: "Do you require an architect?", a: "We can start with your existing architect, or we can help you interview and select from preferred partners." },
-            { q: "What neighborhoods do you focus on?", a: "Highland Park, Preston Hollow, and Historic Old East Dallas." },
-            { q: "Are you veteran-owned?", a: "Yes. Veteran-owned is part of who we are, but we lead with execution and standards." },
-          ];
-
-          return (
-            <div className="grid gap-3">
-              {faqs.map((f) => (
-                <div key={f.q} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-5">
-                  <div className="text-sm font-semibold">{f.q}</div>
-                  <div className="mt-2 text-sm text-[#EDE7D9]/70">{f.a}</div>
-                </div>
-              ))}
-            </div>
-          );
-        }
-
-        function ContactCard() {
-          return (
-            <GlassCard className="p-6">
-              <div className="text-sm font-semibold">Contact</div>
-
-              <div className="mt-4 grid gap-3">
-                <a href={BRAND.phoneHref} className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
-                      <Icon.Phone className="h-5 w-5 text-[#C9A24A]" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold">Call</div>
-                      <div className="text-sm text-[#EDE7D9]/70">{BRAND.phoneDisplay}</div>
-                    </div>
-                  </div>
-                  <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
-                </a>
-
-                <a href={BRAND.emailHref} className="flex items-center justify-between rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5 transition hover:bg-[#C9A24A]/10">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
-                      <Icon.Mail className="h-5 w-5 text-[#C9A24A]" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold">Email</div>
-                      <div className="text-sm text-[#EDE7D9]/70">{BRAND.emailDisplay}</div>
-                    </div>
-                  </div>
-                  <Icon.ArrowRight className="h-5 w-5 text-[#EDE7D9]/60" />
-                </a>
-
-                <div className="rounded-3xl border border-[#C9A24A]/20 bg-[#C9A24A]/4 p-5">
-                  <div className="flex items-center gap-3">
-                    <div className="rounded-2xl border border-[#C9A24A]/25 bg-[#030A05]/65 p-2">
-                      <Icon.MapPin className="h-5 w-5 text-[#C9A24A]" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold">Service areas</div>
-                      <div className="text-sm text-[#EDE7D9]/70">Dallas</div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {BRAND.areas.map((a) => <Pill key={a}>{a}</Pill>)}
-                  </div>
-                </div>
-              </div>
-            </GlassCard>
-          );
-        }
-
-        function PageWrap({ eyebrow, title, subtitle, children, right }) {
-          return (
-            <div className="mx-auto max-w-6xl px-4 pb-16 pt-10">
+            <div className="mx-auto max-w-6xl px-4 py-14 md:py-16">
               <div className="grid gap-8 md:grid-cols-2 md:items-end">
                 <div>
-                  <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">{eyebrow}</div>
-                  <h1 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h1>
-                  {subtitle ? (
-                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">{subtitle}</p>
-                  ) : null}
+                  <div className="text-[11px] uppercase tracking-[0.22em] text-black/45">{eyebrow}</div>
+                  <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h2>
+                  {subtitle ? <p className="mt-4 max-w-2xl text-base leading-relaxed text-black/65">{subtitle}</p> : null}
                 </div>
                 {right ? <div className="md:justify-self-end">{right}</div> : null}
               </div>
@@ -364,242 +158,381 @@ F<!doctype html>
           );
         }
 
-        function HomePage({ onContact, onApproach, onStandards }) {
+        function PlaceholderBlock({ title, body, tall = false }) {
+          return (
+            <Card className={cn("p-6", tall ? "min-h-[340px]" : "min-h-[220px]")}>
+              <div className="flex h-full flex-col justify-between">
+                <div>
+                  <div className="text-sm font-semibold uppercase tracking-[0.18em] text-black/45">Under construction</div>
+                  <div className="mt-4 text-xl font-semibold">{title}</div>
+                  <p className="mt-3 max-w-xl text-sm leading-relaxed text-black/65">{body}</p>
+                </div>
+              </div>
+            </Card>
+          );
+        }
+
+        function ConceptGallery() {
+          const items = [
+            ["Material direction", "material.jpg"],
+            ["Elevation planning", "Elevation.jpg"],
+            ["Lighting plan", "lighting.jpg"],
+            ["Kitchen concepts", "Kitchen.jpg"],
+            ["Bath concepts", "Bath.jpg"],
+            ["Outdoor living", "outdoor.jpg"],
+          ];
+
+          return (
+            <div className="grid gap-4 md:grid-cols-3">
+              {items.map(([title, file]) => (
+                <Card key={title} className="overflow-hidden">
+                  <div className="aspect-[4/3] w-full bg-neutral-100 flex items-center justify-center text-sm text-black/40 uppercase tracking-[0.16em]">
+                    {file}
+                  </div>
+                  <div className="p-5">
+                    <div className="text-sm font-semibold">{title}</div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          );
+        }
+
+        function ProcessCards() {
+          const rows = [
+            {
+              k: "Preconstruction",
+              v: "Detailed review of plans, scope, allowances, likely cost drivers, and coordination gaps before they become expensive."
+            },
+            {
+              k: "Budget discipline",
+              v: "Budgets are built from actual scope, current trade pricing, and realistic finish expectations, then updated throughout the project."
+            },
+            {
+              k: "Field execution",
+              v: "Trades perform better on jobs that are organized and led well. We emphasize preparation, sequencing, accountability, and clean follow-through."
+            },
+            {
+              k: "Owner experience",
+              v: "Direct communication, regular updates, and a project team that keeps decisions moving without creating chaos."
+            },
+          ];
+
+          return (
+            <div className="grid gap-4">
+              {rows.map((r) => (
+                <Card key={r.k} className="p-5">
+                  <div className="text-sm font-semibold">{r.k}</div>
+                  <div className="mt-2 text-sm leading-relaxed text-black/65">{r.v}</div>
+                </Card>
+              ))}
+            </div>
+          );
+        }
+
+        function StandardsGrid() {
+          const items = [
+            ["Scope clarity", "Detailed redline reviews and assumptions routed back to architect, interior designer, landscape architect, and engineers for direction."],
+            ["Bid coordination", "Multiple bids leveled apples-to-apples across labor, materials, schedule duration, and trade partner track record."],
+            ["Allowances", "Reduce allowances wherever possible and convert them into approved selections early to protect budget and schedule."],
+            ["Change orders", "No work stops, changes, or gets redirected until a formal change order is approved reflecting both cost and schedule impact."],
+            ["Schedule discipline", "Defined sequences, contractual duration expectations, and active management to avoid resequencing, trade stacking, and momentum loss."],
+            ["Quality standards", "Long-term trade relationships, building science fundamentals, and expectations that extend beyond what is immediately visible."],
+          ];
+
+          return (
+            <div className="grid gap-4 md:grid-cols-2">
+              {items.map(([t, d]) => (
+                <Card key={t} className="p-6">
+                  <div className="text-sm font-semibold">{t}</div>
+                  <div className="mt-2 text-sm leading-relaxed text-black/65">{d}</div>
+                </Card>
+              ))}
+            </div>
+          );
+        }
+
+        function Bios() {
+          return (
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card className="p-6">
+                <div className="text-xl font-semibold">Jimmy Herblin</div>
+                <div className="mt-1 text-sm uppercase tracking-[0.16em] text-black/45">Chief Executive Officer</div>
+                <p className="mt-4 text-sm leading-relaxed text-black/65">
+                  Jimmy is a Marine Corps veteran who brings broad construction experience spanning remodels, additions, semi-custom production townhomes, semi-custom production single-family homes, and luxury custom residential projects. He holds a Bachelor of Science from Texas A&amp;M University and an MBA from Southern Methodist University, and approaches construction with a strong respect for building science, proper material application, and long-term durability.
+                </p>
+              </Card>
+              <Card className="p-6">
+                <div className="text-xl font-semibold">Cyle Burton</div>
+                <div className="mt-1 text-sm uppercase tracking-[0.16em] text-black/45">Chief Operating Officer</div>
+                <p className="mt-4 text-sm leading-relaxed text-black/65">
+                  Cyle is a retired Marine Corps Sergeant Major and Bronze Star recipient with Valor. He brings significant construction experience across semi-custom production townhomes, luxury custom homes, multifamily, and light commercial work, along with a leadership style grounded in accountability, resourcefulness, follow-through, and strong relationship building under demanding conditions.
+                </p>
+              </Card>
+            </div>
+          );
+        }
+
+        function ContactCards() {
+          return (
+            <div className="grid gap-6 md:grid-cols-2">
+              {BRAND.contacts.map((c) => (
+                <Card key={c.name} className="p-6">
+                  <div className="text-xl font-semibold">{c.name}</div>
+                  <div className="mt-1 text-sm uppercase tracking-[0.16em] text-black/45">{c.title}</div>
+                  <div className="mt-5 grid gap-4 text-sm">
+                    <a href={c.phoneHref} className="flex items-center gap-3 text-black/75 hover:text-black">
+                      <Icon.Phone className="h-5 w-5" />
+                      <span>{c.phoneDisplay}</span>
+                    </a>
+                    <a href={c.emailHref} className="flex items-center gap-3 text-black/75 hover:text-black">
+                      <Icon.Mail className="h-5 w-5" />
+                      <span>{c.emailDisplay}</span>
+                    </a>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          );
+        }
+
+        function VideoSection() {
+          return (
+            <div className="grid gap-6 md:grid-cols-[1.4fr_.9fr]">
+              <Card className="overflow-hidden">
+                <div className="aspect-video w-full bg-black">
+                  <video
+                    className="h-full w-full object-cover"
+                    src={ASSETS.video}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="auto"
+                  ></video>
+                </div>
+              </Card>
+              <PlaceholderBlock
+                title="Extended visual direction reel"
+                body="A longer visual reel will be added later."
+                tall
+              />
+            </div>
+          );
+        }
+
+        function MaterialsPlaceholder() {
+          return (
+            <PlaceholderBlock
+              title="Building materials and assemblies"
+              body="This section stays as a placeholder for now. It can later be expanded into a stronger materials, assemblies, and building science section once you are ready to build it out."
+              tall
+            />
+          );
+        }
+
+        function HomePage({ go }) {
           return (
             <>
-              <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-12 pt-10 md:grid-cols-2 md:items-center md:pb-16">
-                <div>
-                  <div className="flex flex-wrap gap-2">
-                    <Pill>Luxury custom homebuilder</Pill>
-                    <Pill>Veteran-owned</Pill>
-                    <Pill>{BRAND.city}</Pill>
-                  </div>
-
-                  <h1 className="mt-6 text-4xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
-                    We build homes you don’t forget.
-                  </h1>
-
-                  <p className="mt-5 max-w-xl text-base leading-relaxed text-[#EDE7D9]/70 md:text-lg">
-                    Star &amp; Brass Group is a Dallas-based startup run by two Marine Corps veterans. We bring building science fundamentals and hands-on experience across building materials, multifamily, production luxury townhomes, semi-custom, and full luxury custom homes—typically starting around $700/sf on a cost-plus basis.
-                  </p>
-
-                  <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-                    <Button variant="primary" onClick={onContact}>
-                      Request a consult <Icon.ArrowRight className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" onClick={onApproach}>How we work</Button>
-                    <Button variant="ghost" onClick={onStandards}>Our standard</Button>
-                  </div>
-
-                  <GlassCard className="mt-8 p-5">
-                    <div className="text-sm font-semibold">Build your dream with detail-oriented building science professionals.</div>
-                    <div className="mt-1 text-sm text-[#EDE7D9]/70">Clear decisions, disciplined execution, and a team built to protect the standard.</div>
-                  </GlassCard>
-                </div>
-
-                <div className="relative">
-                  <GlassCard className="p-4 shadow-[0_40px_140px_rgba(0,0,0,0.70)]">
-                    <div className="rounded-[28px] border border-[#C9A24A]/20 bg-gradient-to-br from-[#C9A24A]/12 via-[#C9A24A]/7 to-transparent p-5">
-                      <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/60">Startup, serious systems</div>
-                      <div className="mt-6"><ProcessCards /></div>
-                      <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                        <Button variant="dark" href={BRAND.emailHref} className="w-full">
-                          <Icon.Mail className="h-4 w-4" /> Email us
-                        </Button>
-                        <Button variant="ghost" href={BRAND.phoneHref} className="w-full">
-                          <Icon.Phone className="h-4 w-4" /> Call now
-                        </Button>
-                      </div>
+              <div className="mx-auto max-w-6xl px-4 pb-14 pt-10 md:pb-20 md:pt-16">
+                <div className="grid gap-10 md:grid-cols-[1.15fr_.85fr] md:items-center">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-[0.22em] text-black/45">Dallas-based | Serving DFW</div>
+                    <h1 className="mt-4 max-w-4xl text-4xl font-semibold leading-[1.02] tracking-tight md:text-6xl">{COPY.heroHeadline}</h1>
+                    <p className="mt-6 max-w-2xl text-base leading-relaxed text-black/68 md:text-lg">{COPY.heroBody}</p>
+                    <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                      <Button variant="primary" onClick={() => go("contact")}>Start a conversation <Icon.ArrowRight className="h-4 w-4" /></Button>
+                      <Button variant="ghost" onClick={() => go("approach")}>How we work</Button>
                     </div>
-                  </GlassCard>
+                  </div>
+
+                  <Card className="p-6 md:p-8">
+                    <div className="text-[11px] uppercase tracking-[0.22em] text-black/45">Positioning</div>
+                    <p className="mt-4 text-base leading-relaxed text-black/72">{COPY.summary}</p>
+                    <div className="mt-6 grid gap-3 text-sm text-black/72">
+                      <div className="flex items-start gap-3"><Icon.Check className="mt-0.5 h-4 w-4 shrink-0" /><span>Luxury custom focus throughout DFW.</span></div>
+                      <div className="flex items-start gap-3"><Icon.Check className="mt-0.5 h-4 w-4 shrink-0" /><span>Built to be a trusted builder-partner for architects designing in the same price tier of homes we intend to build.</span></div>
+                      <div className="flex items-start gap-3"><Icon.Check className="mt-0.5 h-4 w-4 shrink-0" /><span>Disciplined preconstruction, budgeting, and field execution designed to protect design intent and owner experience.</span></div>
+                    </div>
+                  </Card>
                 </div>
               </div>
 
               <Divider />
-<div className="mx-auto max-w-6xl px-4 pt-14 pb-0">
-  <GlassCard className="p-6">
-    <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-      <div>
-        <div className="text-sm font-semibold">DFW Lot Scout Copilot (Pilot)</div>
-        <div className="mt-2 text-sm text-[#EDE7D9]/70">
-          Shortlist buildable lots, compare neighborhoods using dataset-based signals, and confirm jurisdiction
-          before we spend time on a site visit.
-        </div>
-        <div className="mt-3 text-xs text-[#EDE7D9]/60">
-          Pilot uses a curated dataset updated weekly. Production version would connect to an authorized MLS feed.
-        </div>
-      </div>
 
-      <a
-        href="https://dfw-lot-scout-copilot-511509419148.us-west1.run.app/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center justify-center gap-2 rounded-2xl border border-[#C9A24A]/25 bg-[#C9A24A]/10 px-4 py-3 text-sm font-semibold tracking-wide transition hover:bg-[#C9A24A]/15 no-select"
-      >
-        Launch Lot Scout <Icon.ArrowRight className="h-4 w-4" />
-      </a>
-    </div>
-  </GlassCard>
-</div>
-              <div className="mx-auto max-w-6xl px-4 py-14">
-                <div className="grid gap-8 md:grid-cols-2 md:items-end">
-                  <div>
-                    <div className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55">Visual direction</div>
-                    <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Cinematic concept, photo-ready standards</h2>
-                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#EDE7D9]/70 md:text-base">
-                      We’re a startup, so we won’t borrow photos from past employers. Until our first builds are shot, we show concept media and material direction to communicate taste and standards.
+              <SectionWrap
+                eyebrow="Visual direction"
+                title="A concept of the capability and standard of our finished products"
+                subtitle="Below is a visual concept of the level of home and finish quality Star & Brass Group is accustomed to building."
+                right={<Button variant="ghost" onClick={() => go("contact")}>Contact us <Icon.ArrowRight className="h-4 w-4" /></Button>}
+              >
+                <div className="grid gap-6">
+                  <VideoSection />
+                  <Card className="p-6 md:p-8">
+                    <div className="text-sm font-semibold uppercase tracking-[0.18em] text-black/45">Under construction</div>
+                    <p className="mt-4 max-w-3xl text-sm leading-relaxed text-black/65">
+                      Check back later for more information on material direction, elevation planning, lighting plan, kitchen concepts, bath concepts, and outdoor living.
                     </p>
-                  </div>
-                  <div className="flex justify-start md:justify-end">
-                    <Button variant="ghost" onClick={onContact}>Talk scope <Icon.ArrowRight className="h-4 w-4" /></Button>
-                  </div>
+                    <div className="mt-6">
+                      <ConceptGallery />
+                    </div>
+                  </Card>
                 </div>
-
-                <div className="mt-8">
-                  <VisualDirectionVideo />
-                  <div className="mt-6"><ConceptGallery /></div>
-
-                </div>
-              </div>
+              </SectionWrap>
             </>
           );
         }
 
-        function ApproachPage({ onContact }) {
+        function ApproachPage({ go }) {
           return (
-            <PageWrap
+            <SectionWrap
               eyebrow="Approach"
               title="How we run work"
-              subtitle="Predictable outcomes come from disciplined systems."
-              right={<Button variant="ghost" onClick={onContact}>Start a build <Icon.ArrowRight className="h-4 w-4" /></Button>}
+              subtitle="Predictable outcomes come from disciplined systems, strong communication, and early identification of risk."
+              right={<Button variant="ghost" onClick={() => go("contact")}>Start a conversation <Icon.ArrowRight className="h-4 w-4" /></Button>}
             >
-              <div className="grid gap-8 md:grid-cols-2">
-                <ProcessCards />
-                <GlassCard className="p-6">
-                  <div className="text-sm font-semibold">Owner experience</div>
-                  <div className="mt-2 text-sm text-[#EDE7D9]/70">
-                    Tight scopes. Clean sequencing. Decisions made with context. Site stays disciplined.
+              <div className="grid gap-6 md:grid-cols-2">
+                <Card className="p-6 md:p-8">
+                  <div className="text-xl font-semibold">How we approach a project</div>
+                  <div className="mt-5 grid gap-4 text-sm leading-relaxed text-black/65">
+                    <p>Star & Brass Group approaches custom homebuilding with the belief that premium homes require premium process. We do not view process as bureaucracy. We view it as the framework that protects quality, budget, schedule, and client confidence.</p>
+                    <p>Our role is to function as a builder-partner that brings clarity to complex projects, identifies risk early, and creates a more professional building experience from preconstruction through closeout.</p>
                   </div>
-                </GlassCard>
+                </Card>
+                <ProcessCards />
               </div>
-            </PageWrap>
+
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                <Card className="p-6">
+                  <div className="text-sm font-semibold">Early alignment</div>
+                  <div className="mt-2 text-sm leading-relaxed text-black/65">Successful projects are often won or lost before the first major trade mobilizes. We place strong value on early review of plans, specifications, site conditions, owner priorities, finish expectations, and likely cost drivers so issues are addressed before they become expensive.</div>
+                </Card>
+                <Card className="p-6">
+                  <div className="text-sm font-semibold">Communication</div>
+                  <div className="mt-2 text-sm leading-relaxed text-black/65">Homeowners, architects, interior designers, landscape architects, engineers, and consultants should not have to guess where a project stands. We believe it is our job to surface issues early, communicate clearly, and keep the team aligned as the project moves forward.</div>
+                </Card>
+                <Card className="p-6">
+                  <div className="text-sm font-semibold">Design stewardship</div>
+                  <div className="mt-2 text-sm leading-relaxed text-black/65">Luxury custom homes rise or fall on execution of detail, alignment, proportion, and material transitions. We work to actively protect design intent in the field rather than let it erode during construction.</div>
+                </Card>
+                <Card className="p-6">
+                  <div className="text-sm font-semibold">Problem-solving mindset</div>
+                  <div className="mt-2 text-sm leading-relaxed text-black/65">Construction always involves friction. Our philosophy is that problems should be addressed early, calmly, and directly, with ownership of issues and a bias toward solutions rather than excuses.</div>
+                </Card>
+              </div>
+            </SectionWrap>
           );
         }
 
-        function CapabilitiesPage({ onContact }) {
+        function CapabilitiesPage({ go }) {
           return (
-            <PageWrap
+            <SectionWrap
               eyebrow="Capabilities"
               title="What we build"
-              subtitle="Luxury custom homes and major renovations, executed with building science fundamentals."
-              right={<Button variant="ghost" onClick={onContact}>Talk scope <Icon.ArrowRight className="h-4 w-4" /></Button>}
+              subtitle="Purpose-built for high-end residential work across DFW’s luxury custom market, with the process and coordination required for architect-led projects and demanding clients."
+              right={<Button variant="ghost" onClick={() => go("contact")}>Talk scope <Icon.ArrowRight className="h-4 w-4" /></Button>}
             >
-              <div className="grid gap-6 md:grid-cols-2">
-                <GlassCard className="p-6"><div className="text-sm font-semibold">Custom homes</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Full-service build management from precon through closeout.</div></GlassCard>
-                <GlassCard className="p-6"><div className="text-sm font-semibold">Major renovations</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Structural and envelope work planned to protect the final product.</div></GlassCard>
-                <GlassCard className="p-6 md:col-span-2"><div className="text-sm font-semibold">Team integration</div><div className="mt-2 text-sm text-[#EDE7D9]/70">Work with your architect + designer, or we’ll help you interview and select partners.</div></GlassCard>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Card className="p-6"><div className="text-sm font-semibold">Luxury custom homes</div><div className="mt-2 text-sm leading-relaxed text-black/65">Purpose-built for high-end custom residential projects requiring disciplined execution and strong coordination.</div></Card>
+                <Card className="p-6"><div className="text-sm font-semibold">Major renovations and additions</div><div className="mt-2 text-sm leading-relaxed text-black/65">Selective work where structure, sequencing, and finish protection matter as much as aesthetics.</div></Card>
+                <Card className="p-6 md:col-span-2"><div className="text-sm font-semibold">Team integration</div><div className="mt-2 text-sm leading-relaxed text-black/65">Architects, interior designers, landscape architects, engineers, homeowners, and trade partners all need to stay aligned. We are built to work inside that structure.</div></Card>
               </div>
-            </PageWrap>
+            </SectionWrap>
           );
         }
 
-        function StandardsPage({ onContact }) {
+        function StandardsPage({ go }) {
           return (
-            <PageWrap
+            <SectionWrap
               eyebrow="Standards"
-              title="The standard"
-              subtitle="A quiet, disciplined jobsite that protects schedule, craftsmanship, and finishes."
-              right={<Button variant="ghost" onClick={onContact}>Start a build <Icon.ArrowRight className="h-4 w-4" /></Button>}
+              title="Preconstruction, budgeting, and standards"
+              subtitle="A premium home cannot be managed with rough assumptions, vague allowances, or reactive change-order practices."
+              right={<Button variant="ghost" onClick={() => go("contact")}>Contact us <Icon.ArrowRight className="h-4 w-4" /></Button>}
             >
-              <div className="grid gap-6 md:grid-cols-2">
-                {[
-                  { t:"Clarity", d:"Scopes written for accountability. No fuzzy handoffs." },
-                  { t:"Sequencing", d:"Work planned around long-lead items and critical path." },
-                  { t:"Clean logistics", d:"Material flow that keeps the site tight and safe." },
-                  { t:"Durable assemblies", d:"Building science fundamentals applied where it matters." },
-                ].map((x)=>(
-                  <GlassCard key={x.t} className="p-6">
-                    <div className="text-sm font-semibold">{x.t}</div>
-                    <div className="mt-2 text-sm text-[#EDE7D9]/70">{x.d}</div>
-                  </GlassCard>
-                ))}
-              </div>
-            </PageWrap>
+              <StandardsGrid />
+            </SectionWrap>
           );
         }
 
-        function FAQPage({ onContact }) {
+        function PeoplePage({ go }) {
           return (
-            <PageWrap
-              eyebrow="FAQ"
-              title="Answers upfront"
-              subtitle="The basics clients ask before we kick off."
-              right={<Button variant="ghost" onClick={onContact}>Contact <Icon.ArrowRight className="h-4 w-4" /></Button>}
+            <SectionWrap
+              eyebrow="People"
+              title="Founders"
+              subtitle="Two founders with complementary strengths in business development, preconstruction, operations, field leadership, and relationship-driven execution."
+              right={<Button variant="ghost" onClick={() => go("contact")}>Get in touch <Icon.ArrowRight className="h-4 w-4" /></Button>}
             >
-              <FAQ />
-            </PageWrap>
+              <Bios />
+            </SectionWrap>
           );
         }
 
         function ContactPage() {
           return (
-            <PageWrap
+            <SectionWrap
               eyebrow="Contact"
-              title="Let’s talk about your build"
-              subtitle=""
+              title="Let’s talk about your project"
+              subtitle="No matter what stage you are in, it is never too early to start the conversation."
             >
-              <div className="grid gap-8 md:grid-cols-2 md:items-start">
-                <GlassCard className="p-6">
-                  <div className="text-sm font-semibold">Before we talk numbers</div>
-                  <div className="mt-3 grid gap-3 text-sm text-[#EDE7D9]/75">
-                    {["Where is the property?","New build or major renovation?","Architect/design team selected?","Target start date?"].map((x)=>(
-                      <div key={x} className="rounded-2xl border border-[#C9A24A]/20 bg-[#030A05]/65 p-4">{x}</div>
+              <div className="grid gap-6 md:grid-cols-[.9fr_1.1fr]">
+                <Card className="p-6 md:p-8">
+                  <div className="text-xl font-semibold">What helps upfront</div>
+                  <div className="mt-5 grid gap-3 text-sm text-black/68">
+                    {[
+                      "Property location",
+                      "New build or major renovation",
+                      "Architect or design team status",
+                      "Target start window",
+                      "Any early budget expectations"
+                    ].map((item) => (
+                      <div key={item} className="rounded-2xl border border-black/10 bg-neutral-50 px-4 py-3">{item}</div>
                     ))}
                   </div>
-                </GlassCard>
-                <ContactCard />
+                </Card>
+                <div className="grid gap-6">
+                  <ContactCards />
+                  <Card className="p-6">
+                    <div className="flex items-center gap-3 text-sm text-black/70">
+                      <Icon.Globe className="h-5 w-5" />
+                      <a href={BRAND.websiteHref} className="hover:text-black">{BRAND.websiteDisplay}</a>
+                    </div>
+                    <div className="mt-4 text-sm leading-relaxed text-black/65">{BRAND.serviceArea}</div>
+                  </Card>
+                </div>
               </div>
-            </PageWrap>
+            </SectionWrap>
           );
         }
 
         function App() {
           const nav = useMemo(() => ([
-            { id:"home", label:"Home" },
-            { id:"approach", label:"Approach" },
-            { id:"capabilities", label:"Capabilities" },
-            { id:"standards", label:"Standards" },
-            { id:"faq", label:"FAQ" },
-            { id:"contact", label:"Contact" },
+            { id: "home", label: "Home" },
+            { id: "approach", label: "Approach" },
+            { id: "capabilities", label: "Capabilities" },
+            { id: "standards", label: "Standards" },
+            { id: "people", label: "People" },
+            { id: "contact", label: "Contact" },
           ]), []);
 
           const [page, setPage] = useState("home");
 
           return (
-            <div className="min-h-screen">
-              <JobsiteLabel />
-
-              <div className="pointer-events-none fixed inset-0">
-                <div className="absolute inset-0 bg-[radial-gradient(900px_500px_at_15%_10%,rgba(201,162,74,0.10),transparent_60%)]"></div>
-                <div className="absolute inset-0 bg-[radial-gradient(700px_450px_at_85%_30%,rgba(201,162,74,0.08),transparent_60%)]"></div>
-                <div className="absolute inset-0 bg-gradient-to-b from-[#071E12] via-[#05110A] to-[#030A05]"></div>
-              </div>
-
-              <header className="sticky top-0 z-50 border-b border-[#C9A24A]/20 bg-[#071E12]/75 backdrop-blur">
-                <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-                  <button onClick={()=>setPage("home")} className="text-left no-select">
-                    <div className="text-lg font-semibold">{BRAND.name}</div>
-                    <div className="text-sm text-[#EDE7D9]/60">{BRAND.city}</div>
+            <div className="min-h-screen bg-white text-black">
+              <header className="sticky top-0 z-50 border-b border-black/10 bg-white/90 backdrop-blur">
+                <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
+                  <button onClick={() => setPage("home")} className="text-left no-select">
+                    <div className="text-lg font-semibold tracking-tight">{BRAND.name}</div>
+                    <div className="text-sm text-black/50">{BRAND.city}</div>
                   </button>
 
-                  <nav className="hidden md:flex items-center gap-6">
-                    {nav.map((n)=>(
+                  <nav className="hidden items-center gap-6 md:flex">
+                    {nav.map((n) => (
                       <button
                         key={n.id}
-                        onClick={()=>setPage(n.id)}
+                        onClick={() => setPage(n.id)}
                         className={cn(
-                          "text-[11px] font-semibold tracking-[0.22em] uppercase transition no-select",
-                          page===n.id ? "text-[#C9A24A]" : "text-[#EDE7D9]/70 hover:text-[#EDE7D9]"
+                          "text-[11px] font-semibold uppercase tracking-[0.22em] transition no-select",
+                          page === n.id ? "text-black" : "text-black/45 hover:text-black"
                         )}
                       >
                         {n.label}
@@ -609,37 +542,41 @@ F<!doctype html>
 
                   <div className="flex items-center gap-2">
                     <Button variant="ghost" href={BRAND.phoneHref}><Icon.Phone className="h-4 w-4" />Call</Button>
-                    <Button variant="primary" onClick={()=>setPage("contact")}>Start a build <Icon.ArrowRight className="h-4 w-4" /></Button>
+                    <Button variant="primary" onClick={() => setPage("contact")}>Contact</Button>
                   </div>
                 </div>
               </header>
 
-              <main className="relative">
-                {page==="home" ? <HomePage onContact={()=>setPage("contact")} onApproach={()=>setPage("approach")} onStandards={()=>setPage("standards")} /> : null}
-                {page==="approach" ? <ApproachPage onContact={()=>setPage("contact")} /> : null}
-                {page==="capabilities" ? <CapabilitiesPage onContact={()=>setPage("contact")} /> : null}
-                {page==="standards" ? <StandardsPage onContact={()=>setPage("contact")} /> : null}
-                {page==="faq" ? <FAQPage onContact={()=>setPage("contact")} /> : null}
-                {page==="contact" ? <ContactPage /> : null}
+              <main>
+                {page === "home" && <HomePage go={setPage} />}
+                {page === "approach" && <ApproachPage go={setPage} />}
+                {page === "capabilities" && <CapabilitiesPage go={setPage} />}
+                {page === "standards" && <StandardsPage go={setPage} />}
+                {page === "people" && <PeoplePage go={setPage} />}
+                {page === "contact" && <ContactPage />}
+              </main>
 
-                <footer className="relative border-t border-[#C9A24A]/20 bg-[#05110A]/85">
-                  <div className="mx-auto max-w-6xl px-4 py-10">
-                    <div className="grid gap-6 md:grid-cols-2 md:items-center">
-                      <div>
-                        <div className="text-sm font-semibold">{BRAND.name}</div>
-                        <div className="text-xs text-[#EDE7D9]/60">Veteran-owned • Luxury custom homes • {BRAND.city}</div>
-                      </div>
-                      <div className="flex flex-wrap gap-4 md:justify-end">
-                        {nav.map((n)=>(
-                          <button key={n.id} onClick={()=>setPage(n.id)} className="text-[11px] uppercase tracking-[0.22em] text-[#EDE7D9]/55 hover:text-[#EDE7D9] no-select">
-                            {n.label}
-                          </button>
-                        ))}
-                      </div>
+              <footer className="border-t border-black/10 bg-white">
+                <div className="mx-auto max-w-6xl px-4 py-10">
+                  <div className="grid gap-6 md:grid-cols-2 md:items-center">
+                    <div>
+                      <div className="text-sm font-semibold">{BRAND.name}</div>
+                      <div className="mt-1 text-xs uppercase tracking-[0.16em] text-black/45">Dallas-based | Luxury custom residential | Serving DFW</div>
+                    </div>
+                    <div className="flex flex-wrap gap-4 md:justify-end">
+                      {nav.map((n) => (
+                        <button
+                          key={n.id}
+                          onClick={() => setPage(n.id)}
+                          className="text-[11px] uppercase tracking-[0.22em] text-black/45 hover:text-black no-select"
+                        >
+                          {n.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                </footer>
-              </main>
+                </div>
+              </footer>
             </div>
           );
         }
